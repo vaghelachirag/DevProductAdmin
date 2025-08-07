@@ -1,6 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shopkeeper_admin/screens/product/productListing/product_listing_provider.dart';
 
 
@@ -45,8 +53,10 @@ class SearchProductPage extends ConsumerWidget {
               child: filteredProducts.isEmpty
                   ? const Center(child: Text("No products found"))
                   : Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 6,
+                color: Colors.white,
                 child: ListView.separated(
                   itemCount: filteredProducts.length,
                   separatorBuilder: (_, __) => const Divider(height: 1),
@@ -76,7 +86,7 @@ class SearchProductPage extends ConsumerWidget {
                           IconButton(
                             icon: const Icon(Icons.qr_code, color: Colors.blue),
                             onPressed: () {
-                              _deleteProductDialog(context, ref, product.id);
+                              showQrCodeDialog(context, "test");
                             },
                           ),
                         ],
@@ -142,19 +152,179 @@ class SearchProductPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete Product'),
-        content: const Text('Are you sure you want to delete this product?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        elevation: 6,
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            const SizedBox(width: 8),
+            Text(
+              'Delete Product',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to delete this product?',
+          style: GoogleFonts.poppins(fontSize: 14),
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey[700],
+            ),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.poppins(fontSize: 14),
+            ),
+          ),
+          ElevatedButton.icon(
             onPressed: () {
               ref.read(productListProvider.notifier).update((state) =>
                   state.where((product) => product.id != id).toList());
               Navigator.pop(context);
             },
-            child: const Text('Delete'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            icon: const Icon(Icons.delete_forever),
+            label: Text(
+              'Delete',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  void showQrCodeDialog(BuildContext context, String data) {
+    final screenshotController = ScreenshotController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 340),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Scan QR Code",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 16),
+
+                  /// QR Code inside Screenshot
+                  Screenshot(
+                    controller: screenshotController,
+                    child: QrImageView(
+                      data: data,
+                      version: QrVersions.auto,
+                      size: 200.0,
+                    ),
+                  ),
+
+                  SizedBox(height: 16),
+                  Text(
+                    data,
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+
+                  /// Row of Action Buttons: Share - Download - Print
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      /// Share Button
+                      ElevatedButton.icon(
+                        onPressed: () => Share.share(data),
+                        icon: Icon(Icons.share),
+                        label: Text("Share"),
+                        style: _buttonStyle(Colors.blue),
+                      ),
+
+                      /// Download Button
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final image = await screenshotController.capture();
+                          if (image != null) {
+                            final directory = await getApplicationDocumentsDirectory();
+                            final path = '${directory.path}/qr_code.png';
+                            final file = File(path);
+                            await file.writeAsBytes(image);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("QR saved to $path")),
+                            );
+                          }
+                        },
+                        icon: Icon(Icons.download),
+                        label: Text("Download"),
+                        style: _buttonStyle(Colors.green),
+                      ),
+
+                      /// Print Button
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final image = await screenshotController.capture();
+                          if (image != null) {
+                            await Printing.layoutPdf(
+                              onLayout: (PdfPageFormat format) async => image,
+                            );
+                          }
+                        },
+                        icon: Icon(Icons.print),
+                        label: Text("Print"),
+                        style: _buttonStyle(Colors.orange),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 16),
+
+                  /// Close Button
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close),
+                    label: Text("Close"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 44),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Helper method to style buttons
+  ButtonStyle _buttonStyle(Color color) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
     );
   }
