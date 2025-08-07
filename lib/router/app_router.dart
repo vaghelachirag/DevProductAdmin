@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shopkeeper_admin/base/extensions/utils/app_constant.dart';
 import 'package:shopkeeper_admin/screens/product/addproduct.dart';
 import 'package:shopkeeper_admin/screens/product/productListing/search_product_page.dart';
+import '../screens/billing/billing_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/splash/splash_screen.dart';
 
@@ -26,6 +27,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppConstant.searchProductPage,
       builder: (context, state) => const SearchProductPage(),
+    ),
+    GoRoute(
+      path: AppConstant.billingListPage,
+      builder: (context, state) => const BillingScreen(),
     ),
   ],
     redirect: (context, state) {

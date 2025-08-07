@@ -42,7 +42,7 @@ class DrawerMenu extends StatelessWidget {
                   context,
                   icon: Icons.receipt_long,
                   title: 'Generate Bill',
-                  route: '/searchProductPage'
+                  route: AppConstant.billingListPage
                 ),
               ],
             ),
