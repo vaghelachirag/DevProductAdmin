@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class SearchProductPage extends ConsumerWidget {
     product.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
+
 
     return Scaffold(
       backgroundColor: Colors.pink[50],
@@ -86,7 +88,18 @@ class SearchProductPage extends ConsumerWidget {
                           IconButton(
                             icon: const Icon(Icons.qr_code, color: Colors.blue),
                             onPressed: () {
-                              showQrCodeDialog(context, "test");
+
+                              // Step 1: Your JSON data
+                              final Map<String, dynamic> jsonData = {
+                                'name': 'Chirag',
+                                'email': 'chirag@example.com',
+                                'id': 12345,
+                              };
+
+                              // Step 2: Convert to string
+                              final String jsonString = jsonEncode(jsonData);
+
+                              showQrCodeDialog(context, jsonString);
                             },
                           ),
                         ],
@@ -117,36 +130,100 @@ class SearchProductPage extends ConsumerWidget {
 
   void _showAddCategoryDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Add Category'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Enter category name'),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              final category = controller.text.trim();
-              if (category.isNotEmpty) {
-                ref.read(categoryListProvider.notifier).update((state) {
-                  if (!state.contains(category)) {
-                    return [...state, category];
-                  }
-                  return state;
-                });
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 400),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// Title
+                Row(
+                  children: [
+                    Icon(Icons.category, color: Colors.deepPurple),
+                    SizedBox(width: 10),
+                    Text(
+                      'Add Category',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                /// Text Field
+                TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    labelText: 'Category Name',
+                    hintText: 'Enter category name',
+                    prefixIcon: Icon(Icons.edit),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+
+                /// Buttons Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    /// Cancel
+                    TextButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close),
+                      label: Text('Cancel'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        textStyle: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+
+                    /// Add Button
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        final category = controller.text.trim();
+                        if (category.isNotEmpty) {
+                          ref.read(categoryListProvider.notifier).update((state) {
+                            if (!state.contains(category)) {
+                              return [...state, category];
+                            }
+                            return state;
+                          });
+                        }
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.add),
+                      label: Text('Add'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
+
 
   void _deleteProductDialog(BuildContext context, WidgetRef ref, String id) {
     showDialog(
@@ -223,7 +300,6 @@ class SearchProductPage extends ConsumerWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16),
-
                   /// QR Code inside Screenshot
                   Screenshot(
                     controller: screenshotController,
@@ -235,13 +311,6 @@ class SearchProductPage extends ConsumerWidget {
                   ),
 
                   SizedBox(height: 16),
-                  Text(
-                    data,
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-
                   /// Row of Action Buttons: Share - Download - Print
                   Wrap(
                     spacing: 10,
