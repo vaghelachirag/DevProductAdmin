@@ -1,0 +1,12 @@
+{
+  "app_name": "Shopkeeper Admin",
+  "splash_title": "Manage Stock & Billing",
+  "dashboard": "Dashboard",
+  "add_product": "Add Product",
+  "search_product": "Search Product",
+  "todays_bills": "Today's Bills",
+  "todays_revenue": "Today's Revenue",
+  "monthly_profit": "Monthly Profit",
+  "low_stock": "Low Stock",
+  "low_stock_products": "Low Stock Products"
+}
