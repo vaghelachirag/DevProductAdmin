@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,13 +33,13 @@ class SearchProductPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.pink[50],
       appBar: AppBar(
-        title: Text('Search Products', style: GoogleFonts.poppins()),
+        title: Text('search_products'.tr(), style: GoogleFonts.poppins()),
         backgroundColor: Colors.white,
         elevation: 1,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_box_outlined),
-            tooltip: 'Add Category',
+            tooltip: 'add_category'.tr(),
             onPressed: () {
               _showAddCategoryDialog(context, ref);
             },
@@ -118,7 +119,7 @@ class SearchProductPage extends ConsumerWidget {
   Widget _buildSearchBar(WidgetRef ref) {
     return TextField(
       decoration: InputDecoration(
-        hintText: 'Search by name or category...',
+        hintText: 'search_hint'.tr(),
         prefixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: Colors.white,
@@ -148,7 +149,7 @@ class SearchProductPage extends ConsumerWidget {
                     Icon(Icons.category, color: Colors.deepPurple),
                     SizedBox(width: 10),
                     Text(
-                      'Add Category',
+                      'add_category'.tr(),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -163,8 +164,8 @@ class SearchProductPage extends ConsumerWidget {
                 TextField(
                   controller: controller,
                   decoration: InputDecoration(
-                    labelText: 'Category Name',
-                    hintText: 'Enter category name',
+                    labelText: 'category_name'.tr(),
+                    hintText: 'enter_category_name'.tr(),
                     prefixIcon: Icon(Icons.edit),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -204,7 +205,7 @@ class SearchProductPage extends ConsumerWidget {
                         Navigator.pop(context);
                       },
                       icon: Icon(Icons.add),
-                      label: Text('Add'),
+                      label: Text('add'.tr()),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
@@ -296,7 +297,7 @@ class SearchProductPage extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Scan QR Code",
+                   'scan_qr'.tr(),
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16),
@@ -321,7 +322,7 @@ class SearchProductPage extends ConsumerWidget {
                       ElevatedButton.icon(
                         onPressed: () => Share.share(data),
                         icon: Icon(Icons.share),
-                        label: Text("Share"),
+                        label: Text('share'.tr()),
                         style: _buttonStyle(Colors.blue),
                       ),
 
@@ -340,7 +341,7 @@ class SearchProductPage extends ConsumerWidget {
                           }
                         },
                         icon: Icon(Icons.download),
-                        label: Text("Download"),
+                        label: Text('download'.tr()),
                         style: _buttonStyle(Colors.green),
                       ),
 
@@ -355,7 +356,7 @@ class SearchProductPage extends ConsumerWidget {
                           }
                         },
                         icon: Icon(Icons.print),
-                        label: Text("Print"),
+                        label: Text('print'.tr()),
                         style: _buttonStyle(Colors.orange),
                       ),
                     ],
@@ -367,7 +368,7 @@ class SearchProductPage extends ConsumerWidget {
                   ElevatedButton.icon(
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(Icons.close),
-                    label: Text("Close"),
+                    label: Text('close'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                       foregroundColor: Colors.white,

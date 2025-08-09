@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Farmeasy',
+      title: 'DevAdmin',
       debugShowCheckedModeBanner: false,
       locale: context.locale,
       supportedLocales: context.supportedLocales,

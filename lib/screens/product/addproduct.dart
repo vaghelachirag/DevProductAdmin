@@ -115,20 +115,31 @@ class AddProductPage extends ConsumerWidget {
                             .state = val,
                       ),
                       const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: submit,
-                        icon: const Icon(Icons.add),
-                        label: Text('Add Product',
-                            style: GoogleFonts.poppins(fontSize: 16)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade700,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 4,
+                  ElevatedButton.icon(
+                    onPressed: submit,
+                    icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)), // warm brown
+                    label: Text(
+                      'Add Product',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF7B4B3A), // warm brown
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFDEECF), // pastel beige
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30), // more rounded, playful look
+                        side: const BorderSide(
+                          color: Color(0xFF7B4B3A), // matching outline
+                          width: 1.5,
                         ),
                       ),
+                      elevation: 3,
+                      shadowColor: const Color(0xFF7B4B3A).withOpacity(0.3),
+                    ),
+                  ),
                     ],
                   ),
                 ),

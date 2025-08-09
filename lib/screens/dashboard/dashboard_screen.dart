@@ -91,11 +91,11 @@ class DashboardScreen extends ConsumerWidget {
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
-                      columns: const [
-                        DataColumn(label: Text('Product')),
-                        DataColumn(label: Text('Price')),
-                        DataColumn(label: Text('Qty')),
-                        DataColumn(label: Text('Category')),
+                      columns:  [
+                        DataColumn(label: Text('product'.tr())),
+                        DataColumn(label: Text('price'.tr())),
+                        DataColumn(label: Text('price'.tr())),
+                        DataColumn(label: Text('qty'.tr())),
                       ],
                       rows: const [], // Fill with your data
                     ),

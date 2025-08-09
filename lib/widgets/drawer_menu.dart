@@ -1,7 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shopkeeper_admin/base/extensions/buildcontext_ext.dart';
+import 'package:shopkeeper_admin/base/extensions/utils/app_colors.dart';
+import 'package:shopkeeper_admin/gen/assets.gen.dart';
 import 'package:shopkeeper_admin/screens/product/addproduct.dart';
 import 'package:shopkeeper_admin/screens/splash/splash_screen.dart';
 
@@ -23,25 +26,25 @@ class DrawerMenu extends StatelessWidget {
                 _buildDrawerItem(
                   context,
                   icon: Icons.dashboard,
-                  title: 'Dashboard',
+                  title: 'dashboard'.tr(),
                   route: AppConstant.dashboard
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.add_box_outlined,
-                  title: 'Add Product',
+                  title: 'add_product'.tr(),
                   route: '/addProductPage'
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.search,
-                  title: 'Search Products',
+                  title: 'search_product'.tr(),
                   route: '/searchProductPage'
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.receipt_long,
-                  title: 'Generate Bill',
+                  title: 'generate_bill'.tr(),
                   route: AppConstant.billingListPage
                 ),
               ],
@@ -56,20 +59,17 @@ class DrawerMenu extends StatelessWidget {
     return UserAccountsDrawerHeader(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/drawer_bg.jpg'), // Add your own image
+          image: AssetImage(Assets.images.appLogo.path), // Add your own image
           fit: BoxFit.cover,
         ),
       ),
-      currentAccountPicture: CircleAvatar(
-        backgroundImage: AssetImage('assets/images/profile.png'), // Add your profile image
-      ),
       accountName: Text(
-        'FarmEasy Admin',
-        style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+        'Dev',
+        style: GoogleFonts.poppins(fontWeight: FontWeight.bold,color: AppColors.blackColor),
       ),
       accountEmail: Text(
-        'admin@farmeasy.com',
-        style: GoogleFonts.poppins(fontSize: 12),
+        'jackcomputer.com',
+        style: GoogleFonts.poppins(fontSize: 12,color: AppColors.blackColor),
       ),
     );
   }
