@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shopkeeper_admin/base/extensions/utils/app_constant.dart';
+import 'package:shopkeeper_admin/screens/billDetail/bill_detail_screen.dart';
 
 import '../../widgets/DateNavigator.dart';
 import 'billing_provider.dart';
@@ -55,7 +56,22 @@ class BillingScreen extends ConsumerWidget {
                 return GestureDetector(
                   onTap: (){
                     print("OnTap$index");
-                    context.push(AppConstant.billingDetailPage);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BillDetailScreen(
+                          billNo: "INV-101",
+                          customerName: "Rahul Shah",
+                          mobileNumber: "9876543210",
+                          address: "Ahmedabad, Gujarat",
+                          items: [
+                            {"id": "P001", "price": 120.0, "qty": 2},
+                            {"id": "P002", "price": 75.0, "qty": 3},
+                            {"id": "P003", "price": 50.0, "qty": 1},
+                          ],
+                        ),
+                      ),
+                    );
                   },
                   child:Card(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

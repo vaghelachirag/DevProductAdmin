@@ -84,6 +84,7 @@ flutter:
       fonts:
         - asset: assets/fonts/Poppins-Regular.ttf
         - asset: assets/fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
           weight: 700
 flutter_gen:
   output: lib/gen/

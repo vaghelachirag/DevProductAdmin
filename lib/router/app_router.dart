@@ -32,11 +32,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppConstant.billingListPage,
       builder: (context, state) => const BillingScreen(),
-    ),
-    GoRoute(
-      path: AppConstant.billingDetailPage,
-      builder: (context, state) =>  BillDetailScreen(),
-    ),
+    )
   ],
     redirect: (context, state) {
       if (state.fullPath == '/') {
