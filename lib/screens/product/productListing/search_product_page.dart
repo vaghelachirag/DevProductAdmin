@@ -1,18 +1,18 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shopkeeper_admin/model/product_model.dart';
 import 'package:shopkeeper_admin/screens/product/productListing/product_listing_provider.dart';
-
+import 'dart:html' as html;
 
 class SearchProductPage extends ConsumerWidget {
   const SearchProductPage({super.key});
@@ -20,102 +20,101 @@ class SearchProductPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final products = ref.watch(productListProvider);
     final searchQuery = ref.watch(searchQueryProvider);
+    final productsAsync = ref.watch(productListProvider);
 
-    final filteredProducts = products
-        .where((product) =>
-    product.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+    final ScreenshotController screenshotController = ScreenshotController();
 
-
-    return Scaffold(
-      backgroundColor: Colors.pink[50],
-      appBar: AppBar(
-        title: Text('search_products'.tr(), style: GoogleFonts.poppins()),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_box_outlined),
-            tooltip: 'add_category'.tr(),
-            onPressed: () {
-              _showAddCategoryDialog(context, ref);
-            },
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildSearchBar(ref),
-            const SizedBox(height: 12),
-            Expanded(
-              child: filteredProducts.isEmpty
-                  ? const Center(child: Text("No products found"))
-                  : Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                elevation: 6,
-                color: Colors.white,
-                child: ListView.separated(
-                  itemCount: filteredProducts.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final product = filteredProducts[index];
-                    return ListTile(
-                      title: Text(product.name, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                      subtitle: Text(
-                        'Category: ${product.category} | Qty: ${product.quantity} | ₹${product.sellingPrice.toStringAsFixed(2)}',
-                        style: GoogleFonts.poppins(fontSize: 13),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            onPressed: () {
-                              // TODO: Navigate to Edit Page
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              _deleteProductDialog(context, ref, product.id);
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.qr_code, color: Colors.blue),
-                            onPressed: () {
-
-                              // Step 1: Your JSON data
-                              final Map<String, dynamic> jsonData = {
-                                'name': 'Chirag',
-                                'email': 'chirag@example.com',
-                                'id': 12345,
-                              };
-
-                              // Step 2: Convert to string
-                              final String jsonString = jsonEncode(jsonData);
-
-                              showQrCodeDialog(context, jsonString);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+    return  Scaffold(
+      appBar: AppBar(title: const Text("Product List")),
+      body: productsAsync.when(
+        data: (products) {
+          return loadData(ref,products);
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text("Error: $err")),
       ),
     );
   }
+  }
 
+  Widget loadData(WidgetRef ref, List<ProductModel> products){
+
+    final searchQuery = ref.watch(searchQueryProvider).toLowerCase().trim();
+
+    // Filter products based on product name or category
+    final filteredProducts = products.where((product) {
+      return product.productName.toLowerCase().contains(searchQuery) ||
+          product.category.toLowerCase().contains(searchQuery) ||
+          product.id.toString().contains(searchQuery);
+    }).toList();
+
+  return   Column(
+      children: [
+        _buildSearchBar(ref),
+        const SizedBox(height: 12),
+        Expanded(
+          child: products.isEmpty
+              ? const Center(child: Text("No products found"))
+              : Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 6,
+            color: Colors.white,
+            child: ListView.separated(
+              itemCount: filteredProducts.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final product = filteredProducts[index];
+                return ListTile(
+                  title: Text(product.productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                  subtitle: Text(
+                    'Category: ${product.category} | Qty: ${product.quantity} | ₹${product.purchasePrice.toStringAsFixed(2)}',
+                    style: GoogleFonts.poppins(fontSize: 13),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          // TODO: Navigate to Edit Page
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          _deleteProductDialog(context, ref, product.id.toString());
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.qr_code, color: Colors.blue),
+                        onPressed: () {
+
+                          // Step 1: Your JSON data
+                          final Map<String, dynamic> jsonData = {
+                            'productId': product.id,
+                            'productName': product.category,
+                            'price': product.purchasePrice,
+                            'qty': product.quantity,
+                          };
+
+                          // Step 2: Convert to string
+                          final String jsonString = jsonEncode(jsonData);
+
+                          showQrCodeDialog(context, jsonString,product.productName);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ]
+  );
+  }
   Widget _buildSearchBar(WidgetRef ref) {
     return TextField(
       decoration: InputDecoration(
@@ -261,8 +260,6 @@ class SearchProductPage extends ConsumerWidget {
           ),
           ElevatedButton.icon(
             onPressed: () {
-              ref.read(productListProvider.notifier).update((state) =>
-                  state.where((product) => product.id != id).toList());
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
@@ -281,7 +278,7 @@ class SearchProductPage extends ConsumerWidget {
     );
   }
 
-  void showQrCodeDialog(BuildContext context, String data) {
+  void showQrCodeDialog(BuildContext context, String data, String productId) {
     final screenshotController = ScreenshotController();
 
     showDialog(
@@ -328,21 +325,10 @@ class SearchProductPage extends ConsumerWidget {
 
                       /// Download Button
                       ElevatedButton.icon(
-                        onPressed: () async {
-                          final image = await screenshotController.capture();
-                          if (image != null) {
-                            final directory = await getApplicationDocumentsDirectory();
-                            final path = '${directory.path}/qr_code.png';
-                            final file = File(path);
-                            await file.writeAsBytes(image);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("QR saved to $path")),
-                            );
-                          }
-                        },
-                        icon: Icon(Icons.download),
-                        label: Text('download'.tr()),
-                        style: _buttonStyle(Colors.green),
+                        icon: const Icon(Icons.download),
+                        label: const Text("Download QR"),
+                        style: _buttonStyle(Colors.blue),
+                        onPressed: () { _downloadQRWeb(screenshotController,productId); },
                       ),
 
                       /// Print Button
@@ -387,6 +373,18 @@ class SearchProductPage extends ConsumerWidget {
     );
   }
 
+  Future<void> _downloadQRWeb(ScreenshotController screenshotController, String productId) async {
+    Uint8List? image = await screenshotController.capture();
+    if (image != null) {
+      final blob = html.Blob([image]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", "$productId.png")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    }
+  }
+
   /// Helper method to style buttons
   ButtonStyle _buttonStyle(Color color) {
     return ElevatedButton.styleFrom(
@@ -398,4 +396,3 @@ class SearchProductPage extends ConsumerWidget {
       ),
     );
   }
-}

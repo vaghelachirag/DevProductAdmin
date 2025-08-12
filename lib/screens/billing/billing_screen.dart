@@ -1,10 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
-import 'package:shopkeeper_admin/base/extensions/utils/app_constant.dart';
 import 'package:shopkeeper_admin/screens/billDetail/bill_detail_screen.dart';
 
 import '../../widgets/DateNavigator.dart';
@@ -123,7 +120,7 @@ class BillingScreen extends ConsumerWidget {
                                     const Icon(Icons.attach_money, size: 16, color: Colors.orange),
                                     const SizedBox(width: 4),
                                     Text(
-                                      "${customer.totalAmount.toStringAsFixed(2)}",
+                                      customer.totalAmount.toStringAsFixed(2),
                                       style: GoogleFonts.poppins(fontSize: 13),
                                     ),
                                   ],

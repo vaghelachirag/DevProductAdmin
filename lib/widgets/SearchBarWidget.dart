@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../screens/billing/billing_provider.dart';
 
 class _SearchBar extends ConsumerWidget {
-  const _SearchBar({super.key});
+  const _SearchBar();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(

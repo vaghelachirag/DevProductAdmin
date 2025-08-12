@@ -2,16 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shopkeeper_admin/base/extensions/buildcontext_ext.dart';
 import 'package:shopkeeper_admin/base/extensions/utils/app_colors.dart';
 import 'package:shopkeeper_admin/gen/assets.gen.dart';
-import 'package:shopkeeper_admin/screens/product/addproduct.dart';
-import 'package:shopkeeper_admin/screens/splash/splash_screen.dart';
 
 import '../base/extensions/utils/app_constant.dart';
 
 class DrawerMenu extends StatelessWidget {
-  const DrawerMenu({Key? key}) : super(key: key);
+  const DrawerMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +30,13 @@ class DrawerMenu extends StatelessWidget {
                   context,
                   icon: Icons.add_box_outlined,
                   title: 'add_product'.tr(),
-                  route: '/addProductPage'
+                  route: AppConstant.addProductPage
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.search,
                   title: 'search_product'.tr(),
-                  route: '/searchProductPage'
+                  route: AppConstant.searchProductPage
                 ),
                 _buildDrawerItem(
                   context,

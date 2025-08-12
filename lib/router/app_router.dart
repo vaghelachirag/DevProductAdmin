@@ -1,9 +1,7 @@
 // lib/router/app_router.dart
 
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shopkeeper_admin/base/extensions/utils/app_constant.dart';
-import 'package:shopkeeper_admin/screens/billDetail/bill_detail_screen.dart';
 import 'package:shopkeeper_admin/screens/product/addproduct.dart';
 import 'package:shopkeeper_admin/screens/product/productListing/search_product_page.dart';
 import '../screens/billing/billing_screen.dart';

@@ -7,7 +7,7 @@ import '../screens/billing/billing_provider.dart';
 
 class DateNavigator extends ConsumerWidget {
    final DateTime selectedDate;
-  const DateNavigator({required this.selectedDate});
+  const DateNavigator({super.key, required this.selectedDate});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -1,16 +1,22 @@
+import 'dart:convert';
+import 'dart:convert' as convert;
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
+import '../../api/ApiServices.dart';
+import '../../widgets/product_master_dropdown.dart';
 import 'add_product_provider.dart';
 
 class AddProductPage extends ConsumerWidget {
   static const route = "/AddProductPage";
 
   const AddProductPage({super.key});
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -85,13 +91,7 @@ class AddProductPage extends ConsumerWidget {
                             .state = val,
                       ),
                       const SizedBox(height: 16),
-                      _dropdown(
-                        context,
-                        category,
-                            (val) => ref
-                            .read(productCategoryProvider.notifier)
-                            .state = val,
-                      ),
+                      ProductMasterDropdown(),
                       const SizedBox(height: 16),
                       _textField(
                         context: context,
@@ -115,8 +115,8 @@ class AddProductPage extends ConsumerWidget {
                             .state = val,
                       ),
                       const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: submit,
+                    ElevatedButton.icon(
+                    onPressed: getFeedbackFromSheet,
                     icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)), // warm brown
                     label: Text(
                       'Add Product',
@@ -151,6 +151,49 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
+  Future<void> sendData() async {
+    const url = 'https://script.google.com/macros/s/AKfycbzbTEO2B2lxO_kEmH7juC9RLkZByycz_QViG7LOeaJ4FYB38gs/exec';
+    final body = {
+      'product': 'Test',
+      'category': 'Food',
+      'purchaseprice': '50',
+      'qty': '10',
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      print('Status: ${response.statusCode}');
+      print('Body: ${response.body}');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+
+  Future<void> getFeedbackFromSheet() async {
+
+    const String url = "https://script.google.com/macros/s/AKfycbzgqAweTIPrtsqEwY9HOBNYFBd7SpXAt6wVi65tDyrIdQyAXq6MwPgMxFV4TxuH6r75/exec";
+
+    var raw = await http.get(Uri.parse(url));
+
+    var jsonFeedback = convert.jsonDecode(raw.body);
+    print('this is json Feedback $jsonFeedback');
+
+    // feedbacks = jsonFeedback.map((json) => FeedbackModel.fromJson(json));
+
+    jsonFeedback.forEach((element) {
+      print('$element THIS IS NEXT>>>>>>>');
+
+    });
+
+    //print('${feedbacks[0]}');
+  }
+
   Widget _readonlyField(String label, String value) {
     return TextFormField(
       initialValue: value,
@@ -166,6 +209,23 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
+
+  void addProduct() async {
+    ApiServices productService = ApiServices();
+
+    final result = await productService.addProduct(
+      product: "Laptop",
+      category: "Electronics",
+      purchasePrice: "45000",
+      qty: "10",
+    );
+
+    if (result["success"]) {
+      print("✅ Product added! ID: ${result["id"]}");
+    } else {
+      print("❌ Error: ${result["error"]}");
+    }
+  }
   Widget _textField({
     required BuildContext context,
     required String label,

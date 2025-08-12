@@ -1,11 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:shopkeeper_admin/model/product_model.dart';
 
-// List of products
-final productListProvider = StateProvider<List<ProductModel>>((ref) => [
-  ProductModel(id: '1', name: 'Toy Car', category: 'Toys', sellingPrice: 120.0, quantity: 10),
-  ProductModel(id: '2', name: 'Shirt', category: 'Clothes', sellingPrice: 499.0, quantity: 5),
-]);
+final productListProvider = FutureProvider<List<ProductModel>>((ref) async {
+  const String url =
+      "https://script.google.com/macros/s/AKfycbxUUpDoWsmZ301Cxko2kOioaTIunN38v-xdYmEYJcYr_y0pnAtDnOVQIvpCWdFA9Tfn/exec?sheet=ProductEntries";
+
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> jsonData = jsonDecode(response.body);
+    return jsonData.map((item) => ProductModel.fromJson(item)).toList();
+  } else {
+    throw Exception("Failed to load products");
+  }
+});
+
 
 // Search query
 final searchQueryProvider = StateProvider<String>((ref) => '');

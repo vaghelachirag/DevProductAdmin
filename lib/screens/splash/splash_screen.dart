@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shopkeeper_admin/base/extensions/buildcontext_ext.dart';
-import 'package:shopkeeper_admin/screens/dashboard/dashboard_screen.dart';
-import 'package:shopkeeper_admin/screens/product/addproduct.dart';
-
 import '../../gen/assets.gen.dart';
 
 class SplashScreen extends HookConsumerWidget {
@@ -30,14 +26,19 @@ class SplashScreen extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      body: Center(
-        child: FadeTransition(
-          opacity: animationController,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Assets.images.splashLogo.image(), // your logo here
-            ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white,
+        child: Center(
+          child: FadeTransition(
+            opacity: animationController,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Assets.images.splashLogo.image(), // your logo here
+              ],
+            ),
           ),
         ),
       ),

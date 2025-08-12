@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 
 class PDFInvoiceWebService {
   static Future<Uint8List> generateInvoice({
