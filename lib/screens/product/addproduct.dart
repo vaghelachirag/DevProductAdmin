@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-import '../../api/ApiServices.dart';
 import '../../widgets/product_master_dropdown.dart';
 import 'add_product_provider.dart';
 
@@ -209,23 +208,6 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
-
-  void addProduct() async {
-    ApiServices productService = ApiServices();
-
-    final result = await productService.addProduct(
-      product: "Laptop",
-      category: "Electronics",
-      purchasePrice: "45000",
-      qty: "10",
-    );
-
-    if (result["success"]) {
-      print("✅ Product added! ID: ${result["id"]}");
-    } else {
-      print("❌ Error: ${result["error"]}");
-    }
-  }
   Widget _textField({
     required BuildContext context,
     required String label,

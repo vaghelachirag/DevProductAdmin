@@ -94,7 +94,8 @@ class SearchProductPage extends ConsumerWidget {
                           // Step 1: Your JSON data
                           final Map<String, dynamic> jsonData = {
                             'productId': product.id,
-                            'productName': product.category,
+                            'productCategory': product.category,
+                            'productName': product.productName,
                             'price': product.purchasePrice,
                             'qty': product.quantity,
                           };

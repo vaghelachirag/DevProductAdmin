@@ -4,18 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopkeeper_admin/model/product_model.dart';
 
+import '../../../api/apiServices.dart';
+
+
+final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
+
+// Create the FutureProvider for categories
 final productListProvider = FutureProvider<List<ProductModel>>((ref) async {
-  const String url =
-      "https://script.google.com/macros/s/AKfycbxUUpDoWsmZ301Cxko2kOioaTIunN38v-xdYmEYJcYr_y0pnAtDnOVQIvpCWdFA9Tfn/exec?sheet=ProductEntries";
-
-  final response = await http.get(Uri.parse(url));
-
-  if (response.statusCode == 200) {
-    final List<dynamic> jsonData = jsonDecode(response.body);
-    return jsonData.map((item) => ProductModel.fromJson(item)).toList();
-  } else {
-    throw Exception("Failed to load products");
-  }
+  final apiService = ref.watch(apiServiceProvider); // get ApiService instance
+  return apiService.fetchProduct(); // call method from service
 });
 
 
