@@ -10,7 +10,6 @@ class BillDetailScreen extends StatelessWidget {
   final String customerName;
   final String mobileNumber;
   final String address;
-  final List<Map<String, dynamic>> items;
 
   const BillDetailScreen({
     super.key,
@@ -18,7 +17,6 @@ class BillDetailScreen extends StatelessWidget {
     required this.customerName,
     required this.mobileNumber,
     required this.address,
-    required this.items,
   });
 
   Future<Uint8List> _generateBillPdf() async {

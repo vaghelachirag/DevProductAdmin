@@ -7,28 +7,18 @@ import 'package:shopkeeper_admin/screens/billDetail/bill_detail_screen.dart';
 import '../../widgets/DateNavigator.dart';
 import 'billing_provider.dart';
 
-
 class BillingScreen extends ConsumerWidget {
   const BillingScreen({super.key});
 
-  void _deleteCustomer(WidgetRef ref, String id) {
-    final list = ref.read(customerListProvider);
-    final updatedList = list.where((customer) => customer.id != id).toList();
-    ref.read(customerListProvider.notifier).state = updatedList;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customers = ref.watch(customerListProvider);
     final query = ref.watch(searchQueryProvider);
     final selectedDate = ref.watch(selectedDateProvider);
 
-    final filtered = customers
-        .where((c) =>
-    DateUtils.isSameDay(c.date, selectedDate) &&
-        (c.name.toLowerCase().contains(query.toLowerCase()) ||
-            c.mobile.contains(query)))
-        .toList();
+    // ✅ watch bills from provider with selected date
+    final billsAsync = ref.watch(
+      billsByDateProvider(DateFormat('dd-MM-yyyy').format(selectedDate)),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -37,105 +27,133 @@ class BillingScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          Padding(padding: EdgeInsets.only(left: 20,right: 20),child: _buildSearchBar(ref),),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildSearchBar(ref),
+          ),
           const SizedBox(height: 8),
           DateNavigator(selectedDate: selectedDate),
           const SizedBox(height: 8),
+
+          // ✅ Use AsyncValue.when to handle loading/error/data
           Expanded(
-            child: filtered.isEmpty
-                ? Center(child: Text('no_customers'.tr()))
-                : ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: filtered.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final customer = filtered[index];
-                return GestureDetector(
-                  onTap: (){
-                    print("OnTap$index");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BillDetailScreen(
-                          billNo: "INV-101",
-                          customerName: "Rahul Shah",
-                          mobileNumber: "9876543210",
-                          address: "Ahmedabad, Gujarat",
-                          items: [
-                            {"id": "P001", "price": 120.0, "qty": 2},
-                            {"id": "P002", "price": 75.0, "qty": 3},
-                            {"id": "P003", "price": 50.0, "qty": 1},
-                          ],
+            child: billsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(child: Text("Error: $err")),
+              data: (bills) {
+                // ✅ Filter bills using search query
+                final filtered = bills.where((bill) {
+                  return bill.customerName
+                      .toLowerCase()
+                      .contains(query.toLowerCase()) ||
+                      bill.mobileNumber.toString().contains(query);
+                }).toList();
+
+                if (filtered.isEmpty) {
+                  return Center(child: Text('no_customers'.tr()));
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: filtered.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final customer = filtered[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BillDetailScreen(
+                              billNo: customer.id.toString(),
+                              customerName: customer.customerName,
+                              mobileNumber: customer.mobileNumber.toString(),
+                              address: customer.city
+                            ),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 4,
+                        color: Colors.grey.shade50,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              const CircleAvatar(
+                                radius: 24,
+                                child: Icon(Icons.person, size: 28),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      customer.customerName,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.phone,
+                                            size: 16, color: Colors.blueGrey),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          customer.mobileNumber.toString(),
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.date_range,
+                                            size: 16, color: Colors.green),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          // ✅ If customer.date is String, parse safely
+                                          customer.date.toString(),
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.attach_money,
+                                            size: 16, color: Colors.orange),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          customer.totalAmount
+                                              .toString(),
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_forever,
+                                    color: Colors.redAccent),
+                                onPressed: () {
+
+                                },
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     );
                   },
-                  child:Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 4,
-                    color: Colors.grey.shade50,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          const CircleAvatar(
-                            radius: 24,
-                            child: Icon(Icons.person, size: 28),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  customer.name,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.phone, size: 16, color: Colors.blueGrey),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      customer.mobile,
-                                      style: GoogleFonts.poppins(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.date_range, size: 16, color: Colors.green),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      DateFormat.yMMMd().format(customer.date),
-                                      style: GoogleFonts.poppins(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.attach_money, size: 16, color: Colors.orange),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      customer.totalAmount.toStringAsFixed(2),
-                                      style: GoogleFonts.poppins(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
-                            onPressed: () => _deleteCustomer(ref, customer.id),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
                 );
               },
             ),
@@ -154,7 +172,8 @@ class BillingScreen extends ConsumerWidget {
         fillColor: Colors.white,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      onChanged: (val) => ref.read(searchQueryProvider.notifier).state = val,
+      onChanged: (val) =>
+      ref.read(searchQueryProvider.notifier).state = val,
     );
   }
 }

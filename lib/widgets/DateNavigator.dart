@@ -23,9 +23,14 @@ class DateNavigator extends ConsumerWidget {
                   selectedDate.subtract(const Duration(days: 1));
             },
           ),
-          Text(
-            DateFormat('EEE, MMM d, yyyy').format(selectedDate),
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16),
+          GestureDetector(
+            onTap: (){
+              pickDate(context, ref);
+            },
+            child:   Text(
+              DateFormat('EEE, MMM d, yyyy').format(selectedDate),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.arrow_forward_ios),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopkeeper_admin/model/billing_list_model.dart';
 
 import '../model/product_model.dart';
 
@@ -73,6 +74,23 @@ class ApiService {
       return jsonData.map((item) => ProductModel.fromJson(item)).toList();
     } else {
       throw Exception("Failed to load products");
+    }
+  }
+
+  Future<List<BillingListModel>> getBillsByDate(String date) async {
+    final url = Uri.parse("$_baseUrl?date=$date");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+
+      if (json is Map<String, dynamic> && json['data'] is List) {
+        final List<dynamic> list = json['data'];
+        return list.map((e) => BillingListModel.fromJson(e)).toList();
+      } else {
+        throw Exception("Invalid response format");
+      }
+    } else {
+      throw Exception("Failed to fetch bills");
     }
   }
 }
