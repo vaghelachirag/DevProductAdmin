@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shopkeeper_admin/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:shopkeeper_admin/widgets/drawer_menu.dart';
 import '../../widgets/dashboard_card.dart';
 
@@ -29,83 +30,111 @@ class DashboardScreen extends ConsumerWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Dashboard Cards Section
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children:  [
-                DashboardCard(
-                  title: 'todays_bills'.tr(),
-                  value: '0',
-                  icon: Icons.receipt_long,
-                  backgroundColor: Color(0xFFe1f5fe),
-                  iconColor: Color(0xFF039be5),
-                ),
-                DashboardCard(
-                  title: 'todays_revenue'.tr(),
-                  value: '₹0',
-                  icon: Icons.attach_money,
-                  backgroundColor: Color(0xFFe8f5e9),
-                  iconColor: Color(0xFF43a047),
-                ),
-                DashboardCard(
-                  title: 'monthly_profit'.tr(),
-                  value: '₹0',
-                  icon: Icons.trending_up,
-                  backgroundColor: Color(0xFFf3e5f5),
-                  iconColor: Color(0xFF8e24aa),
-                ),
-                DashboardCard(
-                  title: 'low_stock'.tr(),
-                  value: '0',
-                  icon: Icons.warning,
-                  backgroundColor: Color(0xFFFFF3E0),
-                  iconColor: Color(0xFFF57C00),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('low_stock_products'.tr(),
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        )),
-                    const Divider(thickness: 1.2),
-                    DataTable(
-                      columnSpacing: 20,
-                      headingTextStyle: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+          padding: const EdgeInsets.all(16),
+          child: Consumer(
+            builder: (context, ref, _) {
+              final dashboardAsync = ref.watch(dashboardStatsProvider);
+              return dashboardAsync.when(
+                data: (data) {
+                  final todayBills = data['billCount']?.toString() ?? "0";
+                  final todayRevenue = "₹${data['totalRevenue'] ?? 0}";
+                  final monthlyRevenue = "₹${data['monthlyRevenue'] ?? 0}";
+                  final lowStockCount = data['lowStockCount']?.toString() ?? "0";
+                  final lowStockList = List<Map<String, dynamic>>.from([]);
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// Dashboard Cards
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          DashboardCard(
+                            title: 'todays_bills'.tr(),
+                            value: todayBills,
+                            icon: Icons.receipt_long,
+                            backgroundColor: const Color(0xFFe1f5fe),
+                            iconColor: const Color(0xFF039be5),
+                          ),
+                          DashboardCard(
+                            title: 'todays_revenue'.tr(),
+                            value: todayRevenue,
+                            icon: Icons.attach_money,
+                            backgroundColor: const Color(0xFFe8f5e9),
+                            iconColor: const Color(0xFF43a047),
+                          ),
+                          DashboardCard(
+                            title: 'monthly_profit'.tr(),
+                            value: monthlyRevenue,
+                            icon: Icons.trending_up,
+                            backgroundColor: const Color(0xFFf3e5f5),
+                            iconColor: const Color(0xFF8e24aa),
+                          ),
+                          DashboardCard(
+                            title: 'low_stock'.tr(),
+                            value: lowStockCount,
+                            icon: Icons.warning,
+                            backgroundColor: const Color(0xFFFFF3E0),
+                            iconColor: const Color(0xFFF57C00),
+                          ),
+                        ],
                       ),
-                      columns:  [
-                        DataColumn(label: Text('product'.tr())),
-                        DataColumn(label: Text('price'.tr())),
-                        DataColumn(label: Text('price'.tr())),
-                        DataColumn(label: Text('qty'.tr())),
-                      ],
-                      rows: const [], // Fill with your data
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+
+                      const SizedBox(height: 32),
+
+                      /// Low Stock Table
+                      Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('low_stock_products'.tr(),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              const Divider(thickness: 1.2),
+                              DataTable(
+                                columnSpacing: 20,
+                                headingTextStyle: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                                columns: [
+                                  DataColumn(label: Text('product'.tr())),
+                                  DataColumn(label: Text('price'.tr())),
+                                  DataColumn(label: Text('category'.tr())),
+                                  DataColumn(label: Text('qty'.tr())),
+                                ],
+                                rows: lowStockList.map((item) {
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(Text(item["productName"].toString())),
+                                      DataCell(Text("₹${item["price"]}")),
+                                      DataCell(Text(item["category"].toString())),
+                                      DataCell(Text(item["qty"].toString())),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, st) => Center(child: Text("Error: $e")),
+              );
+            },
+          ),
+    ));
   }
 }

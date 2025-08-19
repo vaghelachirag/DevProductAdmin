@@ -22,6 +22,7 @@ final categoryListProvider = FutureProvider<List<Map<String, dynamic>>>((ref) as
 // --- State provider for selected category ---
 final selectedCategoryProvider = StateProvider<String?>((ref) => null);
 
+
 // --- ConsumerWidget for dropdown ---
 class ProductMasterDropdown extends ConsumerWidget {
   const ProductMasterDropdown({super.key});

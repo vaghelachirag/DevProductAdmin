@@ -9,7 +9,7 @@ class ApiService {
   final String _baseUrl = dotenv.env['APPS_SCRIPT_URL'] ?? '';
 
    Future<List<Map<String, dynamic>>> fetchCategories() async {
-    final Uri url = Uri.parse("$_baseUrl?sheet=ProductMaster");
+    final Uri url = Uri.parse("$_baseUrl?action=getProduct");
 
     final response = await http.get(url);
 
@@ -25,6 +25,31 @@ class ApiService {
       throw Exception("Failed to load categories");
     }
   }
+
+
+  Future<Map<String, dynamic>> fetchDashboardData() async {
+    final Uri url = Uri.parse("$_baseUrl?action=getDashboardStats");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (jsonData["success"] == true) {
+        return {
+          "date": jsonData["date"],
+          "billCount": jsonData["billCount"],
+          "totalRevenue": jsonData["totalRevenue"],
+          "monthlyRevenue": jsonData["monthlyRevenue"],
+          "lowStockCount": jsonData["lowStockCount"],
+        };
+      } else {
+        throw Exception("API returned success=false");
+      }
+    } else {
+      throw Exception("Failed to load dashboard data");
+    }
+  }
+
 
   Future<bool> addCategory(String categoryName) async {
     final Uri url = Uri.parse("$_baseUrl?action=addCategory");
@@ -65,20 +90,26 @@ class ApiService {
 
 
   Future<List<ProductModel>> fetchProduct() async {
-    final Uri url = Uri.parse("$_baseUrl?sheet=ProductEntries");
+    final Uri url = Uri.parse("$_baseUrl?action=getProduct");
 
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = jsonDecode(response.body);
-      return jsonData.map((item) => ProductModel.fromJson(item)).toList();
+      final json = jsonDecode(response.body);
+
+      if (json is Map<String, dynamic> && json['data'] is List) {
+        final List<dynamic> list = json['data'];
+        return list.map((e) => ProductModel.fromJson(e)).toList();
+      } else {
+        throw Exception("Invalid response format");
+      }
     } else {
-      throw Exception("Failed to load products");
+      throw Exception("Failed to fetch bills");
     }
   }
 
   Future<List<BillingListModel>> getBillsByDate(String date) async {
-    final url = Uri.parse("$_baseUrl?date=$date");
+    final url = Uri.parse("$_baseUrl?action=getBill&date=$date");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);

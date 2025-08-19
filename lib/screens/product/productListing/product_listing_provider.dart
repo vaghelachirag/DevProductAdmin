@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:shopkeeper_admin/model/product_model.dart';
 
 import '../../../api/apiServices.dart';
@@ -26,3 +25,4 @@ final categoryListProvider = StateProvider<List<String>>((ref) => [
   'Food',
   'Accessories',
 ]);
+
