@@ -10,6 +10,10 @@ class BillDetailScreen extends StatelessWidget {
   final String customerName;
   final String mobileNumber;
   final String address;
+  final String productName;
+  final String price;
+  final String qty;
+  final String totalAmount ;
 
   const BillDetailScreen({
     super.key,
@@ -17,6 +21,10 @@ class BillDetailScreen extends StatelessWidget {
     required this.customerName,
     required this.mobileNumber,
     required this.address,
+    required this.productName,
+    required this.price,
+    required this.qty,
+    required this.totalAmount,
   });
 
   Future<Uint8List> _generateBillPdf() async {
@@ -57,14 +65,14 @@ class BillDetailScreen extends StatelessWidget {
                   ],
                 ),
                 pw.SizedBox(height: 20),
-                pw.Text("Customer: Rahul Shah", style: pw.TextStyle(font: ttf)),
-                pw.Text("Mobile: 9876543210", style: pw.TextStyle(font: ttf)),
+                pw.Text("Customer: $customerName", style: pw.TextStyle(font: ttf)),
+                pw.Text("Mobile: $mobileNumber", style: pw.TextStyle(font: ttf)),
+                pw.Text("Address: $address", style: pw.TextStyle(font: ttf)),
                 pw.SizedBox(height: 10),
                 pw.Table.fromTextArray(
-                  headers: ["Item ID", "Price", "Qty", "Total"],
+                  headers: ["Item Name", "Price", "Qty", "Total"],
                   data: [
-                    ["P001", "₹120", "2", "₹240"],
-                    ["P002", "₹75", "3", "₹225"],
+                    [productName, "₹$price", qty, "₹$totalAmount"]
                   ],
                   headerStyle: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
                   cellStyle: pw.TextStyle(font: ttf),

@@ -33,6 +33,12 @@ class DrawerMenu extends StatelessWidget {
                   route: AppConstant.addProductPage
                 ),
                 _buildDrawerItem(
+                    context,
+                    icon: Icons.add_box_outlined,
+                    title: 'Add Category',
+                    route: AppConstant.addCategoryPage
+                ),
+                _buildDrawerItem(
                   context,
                   icon: Icons.search,
                   title: 'search_product'.tr(),

@@ -16,4 +16,5 @@ class AppConstant{
   static const String searchProductPage = '/searchProductPage' ;
   static const String billingListPage = '/billingListPage' ;
   static const String billingDetailPage = '/billingDetailPage' ;
+  static const String addCategoryPage = '/addCategoryPage' ;
 }

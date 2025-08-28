@@ -1,14 +1,11 @@
-import 'dart:convert';
-import 'dart:convert' as convert;
-import 'dart:math';
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart';
 import 'package:shopkeeper_admin/model/add_product_model.dart';
 
-import '../../widgets/product_master_dropdown.dart';
+import '../../../widgets/product_master_dropdown.dart';
 import 'add_product_provider.dart';
 
 class AddProductPage extends ConsumerWidget {
@@ -26,42 +23,46 @@ class AddProductPage extends ConsumerWidget {
     final qty = ref.watch(quantityProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
 
+    final isAdding = ref.watch(isAddingProductProvider);
+
     final formKey = GlobalKey<FormState>();
 
     void submit() {
       if (formKey.currentState!.validate()) {
-        debugPrint('Product ID: $productId');
-        debugPrint('Name: $productName');
-        debugPrint('Category: $selectedCategory');
-        debugPrint('Price: $price');
-        debugPrint('Qty: $qty');
-
+        ref.read(isAddingProductProvider.notifier).state = true;
 
         final product = AddProductModel(
           id: productId,
           category: selectedCategory.toString(),
           productName: productName,
           purchasePrice: price,
-          quantity: qty, action: 'addProduct'
+          quantity: qty,
+          action: 'addProduct',
         );
 
         ref.read(addProductProvider(product).future).then((result) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result["message"] ?? "Product added!")),
-          );
+          if(result == true){
+            ref.read(productIdProvider.notifier).state =
+            'P${100000 + Random().nextInt(899999)}';
+            ref.read(productNameProvider.notifier).state = '';
+            ref.read(productCategoryProvider.notifier).state = null;
+            ref.read(purchasePriceProvider.notifier).state = '';
+            ref.read(quantityProvider.notifier).state = '';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Product Added Successfully!"))
+            );
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Product Not Added Successfully!"))
+            );
+          }
         }).catchError((error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(error.toString())),
           );
+        }).whenComplete(() {
+          ref.read(isAddingProductProvider.notifier).state = false; // ✅ stop loading
         });
-
-        // Reset fields
-        ref.read(productIdProvider.notifier).state =
-        'P${100000 + Random().nextInt(899999)}';
-        ref.read(productNameProvider.notifier).state = '';
-        ref.read(productCategoryProvider.notifier).state = null;
-        ref.read(purchasePriceProvider.notifier).state = '';
-        ref.read(quantityProvider.notifier).state = '';
       }
     }
 
@@ -130,31 +131,35 @@ class AddProductPage extends ConsumerWidget {
                             .state = val,
                       ),
                       const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                    onPressed: submit,
-                    icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)), // warm brown
-                    label: Text(
-                      'Add Product',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF7B4B3A), // warm brown
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFDEECF), // pastel beige
-                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30), // more rounded, playful look
-                        side: const BorderSide(
-                          color: Color(0xFF7B4B3A), // matching outline
-                          width: 1.5,
+                      isAdding
+                          ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                          : ElevatedButton.icon(
+                        onPressed: submit,
+                        icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)),
+                        label: Text(
+                          'Add Product',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF7B4B3A),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFDEECF),
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            side: const BorderSide(
+                              color: Color(0xFF7B4B3A),
+                              width: 1.5,
+                            ),
+                          ),
+                          elevation: 3,
+                          shadowColor: const Color(0xFF7B4B3A).withOpacity(0.3),
                         ),
                       ),
-                      elevation: 3,
-                      shadowColor: const Color(0xFF7B4B3A).withOpacity(0.3),
-                    ),
-                  ),
                     ],
                   ),
                 ),

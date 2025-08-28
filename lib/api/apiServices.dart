@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopkeeper_admin/model/add_category_model.dart';
 import 'package:shopkeeper_admin/model/add_product_model.dart';
 import 'package:shopkeeper_admin/model/billing_list_model.dart';
 
@@ -51,22 +53,6 @@ class ApiService {
     }
   }
 
-
-  Future<bool> addCategory(String categoryName) async {
-    final Uri url = Uri.parse("$_baseUrl?action=addCategory");
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"categoryname": categoryName}),
-    );
-
-    if (response.statusCode == 200) {
-      final res = jsonDecode(response.body);
-      return res["success"] == true;
-    } else {
-      throw Exception("Failed to add category");
-    }
-  }
 
   // lib/services/api_service.dart
   Future<List<Map<String, dynamic>>> fetchProductsByCategory(String category) async {
@@ -125,15 +111,29 @@ class ApiService {
       throw Exception("Failed to fetch bills");
     }
   }
-
-  Future<Map<String, dynamic>> addProduct(AddProductModel product) async {
+  // For Add Product
+  Future<bool> addProduct(AddProductModel product) async {
     final uri = Uri.parse(_baseUrl).replace(queryParameters: product.toJson());
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
-      return json['message'] ?? "Product Added!";
+      return true;
     } else {
       throw Exception("Failed to add product");
+      return false;
+    }
+  }
+
+  // For Add Category
+  Future<bool> addCategory(AddCategoryModel category) async {
+    final uri = Uri.parse(_baseUrl).replace(queryParameters: category.toJson());
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return true;
+    } else {
+      throw Exception("Failed to add product");
+      return false;
     }
   }
 }

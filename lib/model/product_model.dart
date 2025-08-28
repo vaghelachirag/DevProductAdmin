@@ -1,5 +1,5 @@
 class ProductModel {
-  final int id;
+  final String id;
   final String productName;
   final String category;
   final int purchasePrice;
@@ -15,7 +15,7 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['Id'] ?? 0,
+      id: json['Id'] ?? '',
       productName: json['ProductName'] ?? '',
       category: json['Category'] ?? '',
       purchasePrice: json['PurchasePrice'] ?? 0,

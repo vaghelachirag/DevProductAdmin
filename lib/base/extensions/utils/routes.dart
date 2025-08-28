@@ -5,7 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopkeeper_admin/screens/dashboard/dashboard_screen.dart';
 
-import '../../../screens/product/addproduct.dart';
+import '../../../screens/category/addCategory.dart';
+import '../../../screens/product/addProduct/addproduct.dart';
 import '../../../screens/splash/splash_screen.dart';
 
 class AppRoute {
@@ -17,6 +18,8 @@ class AppRoute {
         return navigatePushToScreen(DashboardScreen(), settings);
       case AddProductPage.route:
         return navigatePushToScreen(AddProductPage(), settings);
+      case AddCategoryPage.route:
+        return navigatePushToScreen(AddCategoryPage(), settings);
       default:
         return null;
     }
