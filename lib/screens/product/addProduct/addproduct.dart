@@ -18,14 +18,15 @@ class AddProductPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productId = ref.watch(productIdProvider);
-    final productName = ref.watch(productNameProvider);
-    final price = ref.watch(purchasePriceProvider);
-    final qty = ref.watch(quantityProvider);
+
     final selectedCategory = ref.watch(selectedCategoryProvider);
-
     final isAdding = ref.watch(isAddingProductProvider);
-
     final formKey = GlobalKey<FormState>();
+
+    // Controllers
+    final productNameController = ref.watch(productNameControllerProvider);
+    final priceController = ref.watch(purchasePriceControllerProvider);
+    final qtyController = ref.watch(quantityControllerProvider);
 
     void submit() {
       if (formKey.currentState!.validate()) {
@@ -34,14 +35,19 @@ class AddProductPage extends ConsumerWidget {
         final product = AddProductModel(
           id: productId,
           category: selectedCategory.toString(),
-          productName: productName,
-          purchasePrice: price,
-          quantity: qty,
+          productName:  productNameController.text.trim(),
+          purchasePrice: priceController.text.trim(),
+          quantity: qtyController.text.trim(),
           action: 'addProduct',
         );
 
         ref.read(addProductProvider(product).future).then((result) {
           if(result == true){
+
+            productNameController.clear();
+            priceController.clear();
+            qtyController.clear();
+
             ref.read(productIdProvider.notifier).state =
             'P${100000 + Random().nextInt(899999)}';
             ref.read(productNameProvider.notifier).state = '';
@@ -97,23 +103,23 @@ class AddProductPage extends ConsumerWidget {
                     children: [
                       _readonlyField('Product ID', productId),
                       const SizedBox(height: 16),
+                      ProductMasterDropdown(),
+                      const SizedBox(height: 16),
                       _textField(
                         context: context,
                         icon: Icons.text_fields,
                         label: 'Product Name',
-                        initialValue: productName,
+                        controller: productNameController,
                         onChanged: (val) => ref
                             .read(productNameProvider.notifier)
                             .state = val,
                       ),
                       const SizedBox(height: 16),
-                      ProductMasterDropdown(),
-                      const SizedBox(height: 16),
                       _textField(
                         context: context,
                         icon: Icons.attach_money,
                         label: 'Purchase Price',
-                        initialValue: price,
+                        controller: priceController,
                         keyboardType: TextInputType.number,
                         onChanged: (val) => ref
                             .read(purchasePriceProvider.notifier)
@@ -124,11 +130,10 @@ class AddProductPage extends ConsumerWidget {
                         context: context,
                         icon: Icons.confirmation_number,
                         label: 'Quantity',
-                        initialValue: qty,
+                        controller: qtyController,
                         keyboardType: TextInputType.number,
-                        onChanged: (val) => ref
-                            .read(quantityProvider.notifier)
-                            .state = val,
+                        onChanged: (val) =>
+                        ref.read(quantityProvider.notifier).state = val,
                       ),
                       const SizedBox(height: 24),
                       isAdding
@@ -171,7 +176,6 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
-
   Widget _readonlyField(String label, String value) {
     return TextFormField(
       initialValue: value,
@@ -191,12 +195,12 @@ class AddProductPage extends ConsumerWidget {
     required BuildContext context,
     required String label,
     required IconData icon,
-    String? initialValue,
+    required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
     required void Function(String) onChanged,
   }) {
     return TextFormField(
-      initialValue: initialValue,
+      controller: controller,
       keyboardType: keyboardType,
       onChanged: onChanged,
       validator: (val) => val == null || val.isEmpty ? 'Enter $label' : null,
@@ -210,5 +214,4 @@ class AddProductPage extends ConsumerWidget {
       style: GoogleFonts.poppins(),
     );
   }
-
 }

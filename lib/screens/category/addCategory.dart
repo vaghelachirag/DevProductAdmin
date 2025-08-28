@@ -23,6 +23,9 @@ class AddCategoryPage extends ConsumerWidget {
     // Use controller synced with provider
     final controller = TextEditingController(text: categoryName);
 
+    // Controllers
+    final categoryNameController = ref.watch(categoryNameControllerProvider);
+
     controller.selection = TextSelection.fromPosition(
       TextPosition(offset: controller.text.length),
     );
@@ -33,12 +36,13 @@ class AddCategoryPage extends ConsumerWidget {
 
         final category = AddCategoryModel(
           id: "C${100000 + Random().nextInt(899999)}", // random category ID
-          categoryName: controller.text,
+          categoryName: categoryNameController.text,
           action: 'addCategory',
         );
 
         ref.read(addCategoryProvider(category).future).then((result) {
           if (result == true) {
+            categoryNameController.clear();
             ref.read(categoryNameProvider.notifier).state = '';
             controller.clear(); // clear textfield
             ScaffoldMessenger.of(context).showSnackBar(
@@ -91,10 +95,11 @@ class AddCategoryPage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _textField(
-                        controller: controller,
+                        context: context,
+                        icon: Icons.text_fields,
                         label: 'Category Name',
-                        icon: Icons.category,
-                        onChanged: (val) => ref.read(categoryNameProvider.notifier).state = val,
+                        controller: categoryNameController,
+                        onChanged: (val) => {},
                       ),
                       const SizedBox(height: 24),
                       isAdding
@@ -136,15 +141,17 @@ class AddCategoryPage extends ConsumerWidget {
       ),
     );
   }
-
   Widget _textField({
-    required TextEditingController controller,
+    required BuildContext context,
     required String label,
     required IconData icon,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
     required void Function(String) onChanged,
   }) {
     return TextFormField(
       controller: controller,
+      keyboardType: keyboardType,
       onChanged: onChanged,
       validator: (val) => val == null || val.isEmpty ? 'Enter $label' : null,
       decoration: InputDecoration(

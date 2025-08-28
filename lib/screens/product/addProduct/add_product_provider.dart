@@ -1,6 +1,7 @@
 import 'dart:math';
 
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shopkeeper_admin/model/add_product_model.dart';
 import '../../../api/apiServices.dart';
@@ -24,3 +25,26 @@ final addProductProvider = FutureProvider.family<bool, AddProductModel>((ref, pr
 });
 
 final isAddingProductProvider = StateProvider<bool>((ref) => false);
+
+
+/// --- Controllers Providers ---
+final productNameControllerProvider =
+Provider.autoDispose<TextEditingController>((ref) {
+  final controller = TextEditingController();
+  ref.onDispose(controller.dispose);
+  return controller;
+});
+
+final purchasePriceControllerProvider =
+Provider.autoDispose<TextEditingController>((ref) {
+  final controller = TextEditingController();
+  ref.onDispose(controller.dispose);
+  return controller;
+});
+
+final quantityControllerProvider =
+Provider.autoDispose<TextEditingController>((ref) {
+  final controller = TextEditingController();
+  ref.onDispose(controller.dispose);
+  return controller;
+});

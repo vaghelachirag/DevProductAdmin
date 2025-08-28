@@ -70,13 +70,18 @@ class BillDetailScreen extends StatelessWidget {
                 pw.Text("Address: $address", style: pw.TextStyle(font: ttf)),
                 pw.SizedBox(height: 10),
                 pw.Table.fromTextArray(
-                  headers: ["Item Name", "Price", "Qty", "Total"],
+                  headers: ["Item Name", "Category", "Price", "Qty", "Total"],
                   data: [
-                    [productName, "₹$price", qty, "₹$totalAmount"]
+                    [productName, productName, "₹$price", qty, "₹$totalAmount"],
                   ],
-                  headerStyle: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
-                  cellStyle: pw.TextStyle(font: ttf),
-                ),
+                  cellAlignments: {
+                    0: pw.Alignment.center, // Item Name
+                    1: pw.Alignment.center, // Category
+                    2: pw.Alignment.center, // Price
+                    3: pw.Alignment.center, // Qty
+                    4: pw.Alignment.center, // Total
+                  },
+                )
               ],
             ),
           );
