@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopkeeper_admin/model/add_product_model.dart';
 import 'package:shopkeeper_admin/model/billing_list_model.dart';
 
 import '../model/product_model.dart';
@@ -122,6 +123,17 @@ class ApiService {
       }
     } else {
       throw Exception("Failed to fetch bills");
+    }
+  }
+
+  Future<Map<String, dynamic>> addProduct(AddProductModel product) async {
+    final uri = Uri.parse(_baseUrl).replace(queryParameters: product.toJson());
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return json['message'] ?? "Product Added!";
+    } else {
+      throw Exception("Failed to add product");
     }
   }
 }

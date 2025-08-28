@@ -5,7 +5,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:shopkeeper_admin/model/add_product_model.dart';
 
 import '../../widgets/product_master_dropdown.dart';
 import 'add_product_provider.dart';
@@ -21,9 +22,9 @@ class AddProductPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final productId = ref.watch(productIdProvider);
     final productName = ref.watch(productNameProvider);
-    final category = ref.watch(productCategoryProvider);
     final price = ref.watch(purchasePriceProvider);
     final qty = ref.watch(quantityProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
 
     final formKey = GlobalKey<FormState>();
 
@@ -31,13 +32,28 @@ class AddProductPage extends ConsumerWidget {
       if (formKey.currentState!.validate()) {
         debugPrint('Product ID: $productId');
         debugPrint('Name: $productName');
-        debugPrint('Category: $category');
+        debugPrint('Category: $selectedCategory');
         debugPrint('Price: $price');
         debugPrint('Qty: $qty');
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ Product added successfully!')),
+
+        final product = AddProductModel(
+          id: productId,
+          category: selectedCategory.toString(),
+          productName: productName,
+          purchasePrice: price,
+          quantity: qty, action: 'addProduct'
         );
+
+        ref.read(addProductProvider(product).future).then((result) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result["message"] ?? "Product added!")),
+          );
+        }).catchError((error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
+        });
 
         // Reset fields
         ref.read(productIdProvider.notifier).state =
@@ -115,7 +131,7 @@ class AddProductPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 24),
                     ElevatedButton.icon(
-                    onPressed: getFeedbackFromSheet,
+                    onPressed: submit,
                     icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)), // warm brown
                     label: Text(
                       'Add Product',
@@ -150,48 +166,6 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
-  Future<void> sendData() async {
-    const url = 'https://script.google.com/macros/s/AKfycbzbTEO2B2lxO_kEmH7juC9RLkZByycz_QViG7LOeaJ4FYB38gs/exec';
-    final body = {
-      'product': 'Test',
-      'category': 'Food',
-      'purchaseprice': '50',
-      'qty': '10',
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(body),
-      );
-
-      print('Status: ${response.statusCode}');
-      print('Body: ${response.body}');
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-
-  Future<void> getFeedbackFromSheet() async {
-
-    const String url = "https://script.google.com/macros/s/AKfycbzgqAweTIPrtsqEwY9HOBNYFBd7SpXAt6wVi65tDyrIdQyAXq6MwPgMxFV4TxuH6r75/exec";
-
-    var raw = await http.get(Uri.parse(url));
-
-    var jsonFeedback = convert.jsonDecode(raw.body);
-    print('this is json Feedback $jsonFeedback');
-
-    // feedbacks = jsonFeedback.map((json) => FeedbackModel.fromJson(json));
-
-    jsonFeedback.forEach((element) {
-      print('$element THIS IS NEXT>>>>>>>');
-
-    });
-
-    //print('${feedbacks[0]}');
-  }
 
   Widget _readonlyField(String label, String value) {
     return TextFormField(
@@ -232,24 +206,4 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
-  Widget _dropdown(BuildContext context, String? value,
-      void Function(String?) onChanged) {
-    final categories = ['Clothes', 'Toys', 'Food', 'Accessories', 'Shoes'];
-    return DropdownButtonFormField<String>(
-      value: value,
-      items: categories
-          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-          .toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: 'Category',
-        prefixIcon: const Icon(Icons.category),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Colors.grey[50],
-      ),
-      validator: (val) => val == null ? 'Select a category' : null,
-      style: GoogleFonts.poppins(),
-    );
-  }
 }
