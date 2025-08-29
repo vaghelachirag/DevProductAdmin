@@ -18,6 +18,10 @@ class $AssetsImagesGen {
   AssetGenImage get appLogo =>
       const AssetGenImage('assets/images/app_logo.png');
 
+  /// File path: assets/images/app_logo.png
+  AssetGenImage get whatsappLogo =>
+      const AssetGenImage('assets/icons/whatsappicon.png');
+
   /// File path: assets/images/splash_logo.png
   AssetGenImage get splashLogo =>
       const AssetGenImage('assets/images/splash_logo.png');
@@ -46,6 +50,7 @@ class Assets {
   const Assets._();
 
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $AssetsImagesGen icons = $AssetsImagesGen();
   static const $AssetsTranslationsGen translations = $AssetsTranslationsGen();
 }
 

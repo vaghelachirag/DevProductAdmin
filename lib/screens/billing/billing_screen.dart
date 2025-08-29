@@ -64,11 +64,16 @@ class BillingScreen extends ConsumerWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => BillDetailScreen(
+                            builder: (_) =>
+                                BillDetailScreen(
                               billNo: customer.id.toString(),
                               customerName: customer.customerName,
                               mobileNumber: customer.mobileNumber.toString(),
-                              address: customer.city, productName: customer.productName, price: customer.sellingPrice.toString(), qty: customer.qty.toString(), totalAmount: customer.totalAmount.toString(),
+                              address: customer.city,
+                              productName: customer.productName,
+                              category: customer.category,
+                             price: customer.sellingPrice.toString(),
+                                  qty: customer.qty.toString(), totalAmount: customer.totalAmount.toString(),
                             ),
                           ),
                         );
