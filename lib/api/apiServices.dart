@@ -1,15 +1,18 @@
 import 'dart:convert';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopkeeper_admin/model/add_category_model.dart';
 import 'package:shopkeeper_admin/model/add_product_model.dart';
 import 'package:shopkeeper_admin/model/billing_list_model.dart';
 
+import '../appConfig.dart';
+import '../model/low_stock_model.dart';
 import '../model/product_model.dart';
 
+
 class ApiService {
-  final String _baseUrl = dotenv.env['APPS_SCRIPT_URL'] ?? '';
+  final String _baseUrl =  AppConfig.get("API_URL") ?? '';
+
 
    Future<List<Map<String, dynamic>>> fetchCategories() async {
     final Uri url = Uri.parse("$_baseUrl?action=getProduct");
@@ -99,6 +102,7 @@ class ApiService {
     final url = Uri.parse("$_baseUrl?action=getBill&date=$date");
     final response = await http.get(url);
     if (response.statusCode == 200) {
+
       final json = jsonDecode(response.body);
 
       if (json is Map<String, dynamic> && json['data'] is List) {
@@ -134,6 +138,32 @@ class ApiService {
     } else {
       throw Exception("Failed to add product");
       return false;
+    }
+  }
+
+
+  /// 📌 Get Low Stock Product List
+  Future<List<LowStockModel>> getLowStockProducts() async {
+    try {
+      final uri = Uri.parse("$_baseUrl?action=getLowStockProducts");
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['success'] == true) {
+          return (data['products'] as List)
+              .map((item) => LowStockModel.fromJson(item))
+              .toList();
+        } else {
+          throw Exception(data['error']);
+        }
+      } else {
+        throw Exception("HTTP Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      return [];
     }
   }
 }

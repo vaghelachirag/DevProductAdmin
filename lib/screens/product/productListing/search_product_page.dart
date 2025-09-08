@@ -69,7 +69,7 @@ Widget loadData(WidgetRef ref, List<ProductModel> products){
                 return ListTile(
                   title: Text(product.productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                   subtitle: Text(
-                    'Category: ${product.category} | Qty: ${product.quantity} | ₹${product.purchasePrice.toStringAsFixed(2)}',
+                    'Category: ${product.category} | Qty: ${product.quantity} | Purchase: ₹${product.purchasePrice.toStringAsFixed(2)} |  Selling: ₹${product.sellingPrice.toStringAsFixed(2)}',
                     style: GoogleFonts.poppins(fontSize: 13),
                   ),
                   trailing: Row(
@@ -96,7 +96,7 @@ Widget loadData(WidgetRef ref, List<ProductModel> products){
                             'productId': product.id,
                             'productCategory': product.category,
                             'productName': product.productName,
-                            'price': product.purchasePrice,
+                            'price': product.sellingPrice,
                             'qty': product.quantity,
                           };
 

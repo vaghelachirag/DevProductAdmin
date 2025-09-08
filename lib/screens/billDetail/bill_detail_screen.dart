@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -11,6 +10,7 @@ class BillDetailScreen extends StatelessWidget {
   final String customerName;
   final String mobileNumber;
   final String address;
+  final String billDate;
   final String productName;
   final String category;
   final String price;
@@ -23,6 +23,7 @@ class BillDetailScreen extends StatelessWidget {
     required this.customerName,
     required this.mobileNumber,
     required this.address,
+    required this.billDate,
     required this.productName,
     required this.category,
     required this.price,
@@ -100,6 +101,8 @@ class BillDetailScreen extends StatelessWidget {
                 pw.Text("Mobile: $mobileNumber",
                     style: pw.TextStyle(font: ttf)),
                 pw.Text("Address: $address",
+                    style: pw.TextStyle(font: ttf)),
+                pw.Text("Bill Date: $billDate",
                     style: pw.TextStyle(font: ttf)),
                 pw.Text("Bill No: $billNo", style: pw.TextStyle(font: ttf)),
                 pw.SizedBox(height: 10),

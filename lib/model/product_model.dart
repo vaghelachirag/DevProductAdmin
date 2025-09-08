@@ -3,6 +3,7 @@ class ProductModel {
   final String productName;
   final String category;
   final int purchasePrice;
+  final int sellingPrice;
   final int quantity;
 
   ProductModel({
@@ -10,6 +11,7 @@ class ProductModel {
     required this.productName,
     required this.category,
     required this.purchasePrice,
+    required this.sellingPrice,
     required this.quantity,
   });
 
@@ -19,6 +21,7 @@ class ProductModel {
       productName: json['ProductName'] ?? '',
       category: json['Category'] ?? '',
       purchasePrice: json['PurchasePrice'] ?? 0,
+      sellingPrice: json['SellingPrice'] ?? 0,
       quantity: json['Qty'] ?? 0,
     );
   }

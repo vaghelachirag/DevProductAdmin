@@ -7,6 +7,7 @@ import 'package:shopkeeper_admin/model/add_product_model.dart';
 
 import '../../../widgets/product_master_dropdown.dart';
 import 'add_product_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AddProductPage extends ConsumerWidget {
   static const route = "/AddProductPage";
@@ -26,6 +27,7 @@ class AddProductPage extends ConsumerWidget {
     // Controllers
     final productNameController = ref.watch(productNameControllerProvider);
     final priceController = ref.watch(purchasePriceControllerProvider);
+    final sellingPriceController = ref.watch(sellingPriceControllerProvider);
     final qtyController = ref.watch(quantityControllerProvider);
 
     void submit() {
@@ -37,6 +39,7 @@ class AddProductPage extends ConsumerWidget {
           category: selectedCategory.toString(),
           productName:  productNameController.text.trim(),
           purchasePrice: priceController.text.trim(),
+          sellingPrice: sellingPriceController.text.trim(),
           quantity: qtyController.text.trim(),
           action: 'addProduct',
         );
@@ -53,7 +56,9 @@ class AddProductPage extends ConsumerWidget {
             ref.read(productNameProvider.notifier).state = '';
             ref.read(productCategoryProvider.notifier).state = null;
             ref.read(purchasePriceProvider.notifier).state = '';
+            ref.read(sellingPriceProvider.notifier).state = '';
             ref.read(quantityProvider.notifier).state = '';
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Product Added Successfully!"))
             );
@@ -77,7 +82,7 @@ class AddProductPage extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Add Product',
+        title: Text('addProduct'.tr(),
             style: GoogleFonts.poppins(
               color: Colors.black87,
               fontWeight: FontWeight.w600,
@@ -101,14 +106,14 @@ class AddProductPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _readonlyField('Product ID', productId),
+                      _readonlyField('productId'.tr(), productId),
                       const SizedBox(height: 16),
                       ProductMasterDropdown(),
                       const SizedBox(height: 16),
                       _textField(
                         context: context,
                         icon: Icons.text_fields,
-                        label: 'Product Name',
+                        label: 'productName'.tr(),
                         controller: productNameController,
                         onChanged: (val) => ref
                             .read(productNameProvider.notifier)
@@ -118,7 +123,7 @@ class AddProductPage extends ConsumerWidget {
                       _textField(
                         context: context,
                         icon: Icons.attach_money,
-                        label: 'Purchase Price',
+                        label: 'purchasePrice'.tr(),
                         controller: priceController,
                         keyboardType: TextInputType.number,
                         onChanged: (val) => ref
@@ -128,23 +133,32 @@ class AddProductPage extends ConsumerWidget {
                       const SizedBox(height: 16),
                       _textField(
                         context: context,
+                        icon: Icons.attach_money,
+                        label: 'sellingPrice'.tr(),
+                        controller: sellingPriceController,
+                        keyboardType: TextInputType.number,
+                        onChanged: (val) => ref
+                            .read(sellingPriceProvider.notifier)
+                            .state = val,
+                      ),
+                      const SizedBox(height: 16),
+                      _textField(
+                        context: context,
                         icon: Icons.confirmation_number,
-                        label: 'Quantity',
+                        label:  'quantity'.tr(),
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         onChanged: (val) =>
                         ref.read(quantityProvider.notifier).state = val,
                       ),
                       const SizedBox(height: 24),
-                      isAdding
-                          ? const Center(
+                      if (isAdding) const Center(
                         child: CircularProgressIndicator(),
-                      )
-                          : ElevatedButton.icon(
+                      ) else ElevatedButton.icon(
                         onPressed: submit,
                         icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)),
                         label: Text(
-                          'Add Product',
+                          'addProduct'.tr(),
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

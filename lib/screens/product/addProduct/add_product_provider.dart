@@ -15,6 +15,7 @@ final productIdProvider = StateProvider<String>((ref) {
 final productNameProvider = StateProvider<String>((ref) => '');
 final productCategoryProvider = StateProvider<String?>((ref) => null);
 final purchasePriceProvider = StateProvider<String>((ref) => '');
+final sellingPriceProvider = StateProvider<String>((ref) => '');
 final quantityProvider = StateProvider<String>((ref) => '');
 
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
@@ -41,6 +42,14 @@ Provider.autoDispose<TextEditingController>((ref) {
   ref.onDispose(controller.dispose);
   return controller;
 });
+
+final sellingPriceControllerProvider =
+Provider.autoDispose<TextEditingController>((ref) {
+  final controller = TextEditingController();
+  ref.onDispose(controller.dispose);
+  return controller;
+});
+
 
 final quantityControllerProvider =
 Provider.autoDispose<TextEditingController>((ref) {

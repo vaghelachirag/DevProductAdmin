@@ -15,7 +15,6 @@ class BillingScreen extends ConsumerWidget {
     final query = ref.watch(searchQueryProvider);
     final selectedDate = ref.watch(selectedDateProvider);
 
-    // ✅ watch bills from provider with selected date
     final billsAsync = ref.watch(
       billsByDateProvider(DateFormat('dd-MM-yyyy').format(selectedDate)),
     );
@@ -34,12 +33,10 @@ class BillingScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           DateNavigator(selectedDate: selectedDate),
           const SizedBox(height: 8),
-
-          // ✅ Use AsyncValue.when to handle loading/error/data
           Expanded(
             child: billsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(child: Text("Error: $err")),
+              error: (err, _) =>   Center(child: Text('no_customers'.tr())),
               data: (bills) {
                 // ✅ Filter bills using search query
                 final filtered = bills.where((bill) {
@@ -70,6 +67,7 @@ class BillingScreen extends ConsumerWidget {
                               customerName: customer.customerName,
                               mobileNumber: customer.mobileNumber.toString(),
                               address: customer.city,
+                              billDate: customer.date,
                               productName: customer.productName,
                               category: customer.category,
                              price: customer.sellingPrice.toString(),
@@ -82,81 +80,85 @@ class BillingScreen extends ConsumerWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        elevation: 4,
-                        color: Colors.grey.shade50,
+                        elevation: 3,
+                        color: Colors.white,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(14.0),
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const CircleAvatar(
-                                radius: 24,
-                                child: Icon(Icons.person, size: 28),
+                              // Profile / Avatar
+                              CircleAvatar(
+                                radius: 28,
+                                backgroundColor: Colors.blue.shade100,
+                                child: const Icon(Icons.person, size: 30, color: Colors.blue),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 14),
+
+                              // Customer details
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // Name
                                     Text(
                                       customer.customerName,
                                       style: GoogleFonts.poppins(
-                                        fontSize: 16,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 6),
+
+                                    // Mobile Number
                                     Row(
                                       children: [
                                         const Icon(Icons.phone,
                                             size: 16, color: Colors.blueGrey),
-                                        const SizedBox(width: 4),
+                                        const SizedBox(width: 6),
                                         Text(
                                           customer.mobileNumber.toString(),
                                           style: GoogleFonts.poppins(
-                                              fontSize: 13),
+                                            fontSize: 14,
+                                            color: Colors.black54,
+                                          ),
                                         ),
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.date_range,
-                                            size: 16, color: Colors.green),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          // ✅ If customer.date is String, parse safely
-                                          customer.date.toString(),
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 13),
-                                        ),
-                                      ],
-                                    ),
+                                    const SizedBox(height: 6),
+
+                                    // Total Amount
                                     Row(
                                       children: [
                                         const Icon(Icons.attach_money,
-                                            size: 16, color: Colors.orange),
-                                        const SizedBox(width: 4),
+                                            size: 18, color: Colors.green),
+                                        const SizedBox(width: 6),
                                         Text(
-                                          customer.totalAmount
-                                              .toString(),
+                                          customer.totalAmount.toString(),
                                           style: GoogleFonts.poppins(
-                                              fontSize: 13),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.green.shade700,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_forever,
-                                    color: Colors.redAccent),
-                                onPressed: () {
 
+                              // Delete Button
+                              IconButton(
+                                icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+                                onPressed: () {
+                                  // Handle delete
                                 },
                               )
                             ],
                           ),
                         ),
-                      ),
+                      )
                     );
                   },
                 );

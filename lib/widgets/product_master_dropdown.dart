@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -36,7 +37,7 @@ class ProductMasterDropdown extends ConsumerWidget {
       data: (categoryList) {
         return DropdownButtonFormField<String>(
           value: selectedCategory,
-          hint: const Text("Select Category"),
+          hint:  Text("selectCategory".tr()),
           items: categoryList.map((category) {
             return DropdownMenuItem<String>(
               value: category["categoryname"],

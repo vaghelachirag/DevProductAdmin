@@ -4,6 +4,7 @@ class AddProductModel {
   final String productName;
   final String category;
   final String  purchasePrice;
+  final String  sellingPrice;
   final String quantity;
 
   AddProductModel({
@@ -12,6 +13,7 @@ class AddProductModel {
     required this.productName,
     required this.category,
     required this.purchasePrice,
+    required this.sellingPrice,
     required this.quantity,
   });
 
@@ -22,6 +24,7 @@ class AddProductModel {
       'Category': category,
       'ProductName': productName,
       'PurchasePrice': purchasePrice.toString(),
+      'SellingPrice': sellingPrice.toString(),
       'Qty': quantity.toString()
     };
   }

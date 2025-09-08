@@ -35,7 +35,7 @@ class DrawerMenu extends StatelessWidget {
                 _buildDrawerItem(
                     context,
                     icon: Icons.add_box_outlined,
-                    title: 'Add Category',
+                    title: 'addCategory'.tr(),
                     route: AppConstant.addCategoryPage
                 ),
                 _buildDrawerItem(

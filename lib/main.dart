@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shopkeeper_admin/router/app_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'appConfig.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   // Load the .env file
-  await dotenv.load(fileName: "assets/.env");
+ // await dotenv.load(fileName: "assets/.env");
+  await AppConfig.load(); // load env.json before runApp
   runApp(
     ProviderScope(
       child: EasyLocalization(
