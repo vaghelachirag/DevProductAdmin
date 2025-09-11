@@ -20,12 +20,10 @@ class BillingScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("📋 Customer List"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("📋 Customer List"), centerTitle: true),
       body: Column(
         children: [
+          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: _buildSearchBar(ref),
@@ -36,13 +34,12 @@ class BillingScreen extends ConsumerWidget {
           Expanded(
             child: billsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) =>   Center(child: Text('no_customers'.tr())),
+              error: (err, _) => Center(child: Text('no_customers'.tr())),
               data: (bills) {
-                // ✅ Filter bills using search query
                 final filtered = bills.where((bill) {
-                  return bill.customerName
-                      .toLowerCase()
-                      .contains(query.toLowerCase()) ||
+                  return bill.customerName.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ||
                       bill.mobileNumber.toString().contains(query);
                 }).toList();
 
@@ -61,8 +58,7 @@ class BillingScreen extends ConsumerWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                BillDetailScreen(
+                            builder: (_) => BillDetailScreen(
                               billNo: customer.id.toString(),
                               customerName: customer.customerName,
                               mobileNumber: customer.mobileNumber.toString(),
@@ -70,8 +66,9 @@ class BillingScreen extends ConsumerWidget {
                               billDate: customer.date,
                               productName: customer.productName,
                               category: customer.category,
-                             price: customer.sellingPrice.toString(),
-                                  qty: customer.qty.toString(), totalAmount: customer.totalAmount.toString(),
+                              price: customer.sellingPrice.toString(),
+                              qty: customer.qty.toString(),
+                              totalAmount: customer.totalAmount.toString(),
                             ),
                           ),
                         );
@@ -91,7 +88,11 @@ class BillingScreen extends ConsumerWidget {
                               CircleAvatar(
                                 radius: 28,
                                 backgroundColor: Colors.blue.shade100,
-                                child: const Icon(Icons.person, size: 30, color: Colors.blue),
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 30,
+                                  color: Colors.blue,
+                                ),
                               ),
                               const SizedBox(width: 14),
 
@@ -114,8 +115,11 @@ class BillingScreen extends ConsumerWidget {
                                     // Mobile Number
                                     Row(
                                       children: [
-                                        const Icon(Icons.phone,
-                                            size: 16, color: Colors.blueGrey),
+                                        const Icon(
+                                          Icons.phone,
+                                          size: 16,
+                                          color: Colors.blueGrey,
+                                        ),
                                         const SizedBox(width: 6),
                                         Text(
                                           customer.mobileNumber.toString(),
@@ -131,8 +135,11 @@ class BillingScreen extends ConsumerWidget {
                                     // Total Amount
                                     Row(
                                       children: [
-                                        const Icon(Icons.attach_money,
-                                            size: 18, color: Colors.green),
+                                        const Icon(
+                                          Icons.attach_money,
+                                          size: 18,
+                                          color: Colors.green,
+                                        ),
                                         const SizedBox(width: 6),
                                         Text(
                                           customer.totalAmount.toString(),
@@ -150,15 +157,18 @@ class BillingScreen extends ConsumerWidget {
 
                               // Delete Button
                               IconButton(
-                                icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+                                icon: const Icon(
+                                  Icons.delete_forever,
+                                  color: Colors.redAccent,
+                                ),
                                 onPressed: () {
                                   // Handle delete
                                 },
-                              )
+                              ),
                             ],
                           ),
                         ),
-                      )
+                      ),
                     );
                   },
                 );
@@ -179,8 +189,7 @@ class BillingScreen extends ConsumerWidget {
         fillColor: Colors.white,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      onChanged: (val) =>
-      ref.read(searchQueryProvider.notifier).state = val,
+      onChanged: (val) => ref.read(searchQueryProvider.notifier).state = val,
     );
   }
 }

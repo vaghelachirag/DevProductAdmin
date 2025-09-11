@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html' as html;
 import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -12,7 +13,6 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shopkeeper_admin/model/product_model.dart';
 import 'package:shopkeeper_admin/screens/product/productListing/product_listing_provider.dart';
-import 'dart:html' as html;
 
 class SearchProductPage extends ConsumerWidget {
   const SearchProductPage({super.key});
@@ -25,11 +25,11 @@ class SearchProductPage extends ConsumerWidget {
 
     final ScreenshotController screenshotController = ScreenshotController();
 
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(title: const Text("Product List")),
       body: productsAsync.when(
         data: (products) {
-          return loadData(ref,products);
+          return loadData(ref, products);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text("Error: $err")),
@@ -38,8 +38,7 @@ class SearchProductPage extends ConsumerWidget {
   }
 }
 
-Widget loadData(WidgetRef ref, List<ProductModel> products){
-
+Widget loadData(WidgetRef ref, List<ProductModel> products) {
   final searchQuery = ref.watch(searchQueryProvider).toLowerCase().trim();
 
   // Filter products based on product name or category
@@ -49,73 +48,91 @@ Widget loadData(WidgetRef ref, List<ProductModel> products){
         product.id.toString().contains(searchQuery);
   }).toList();
 
-  return   Column(
-      children: [
-        _buildSearchBar(ref),
-        const SizedBox(height: 12),
-        Expanded(
-          child: products.isEmpty
-              ? const Center(child: Text("No products found"))
-              : Card(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 6,
-            color: Colors.white,
-            child: ListView.separated(
-              itemCount: filteredProducts.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final product = filteredProducts[index];
-                return ListTile(
-                  title: Text(product.productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                    'Category: ${product.category} | Qty: ${product.quantity} | Purchase: ₹${product.purchasePrice.toStringAsFixed(2)} |  Selling: ₹${product.sellingPrice.toStringAsFixed(2)}',
-                    style: GoogleFonts.poppins(fontSize: 13),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () {
-                          // TODO: Navigate to Edit Page
-                        },
+  return Column(
+    children: [
+      const SizedBox(height: 10),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: _buildSearchBar(ref),
+      ),
+      const SizedBox(height: 12),
+      Expanded(
+        child: products.isEmpty
+            ? const Center(child: Text("No products found"))
+            : Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 6,
+                color: Colors.white,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: filteredProducts.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final product = filteredProducts[index];
+                    return ListTile(
+                      title: Text(
+                        product.productName,
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _deleteProductDialog(context, ref, product.id.toString());
-                        },
+                      subtitle: Text(
+                        'Category: ${product.category} | Qty: ${product.quantity} | Purchase: ₹${product.purchasePrice.toStringAsFixed(2)} |  Selling: ₹${product.sellingPrice.toStringAsFixed(2)}',
+                        style: GoogleFonts.poppins(fontSize: 13),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.qr_code, color: Colors.blue),
-                        onPressed: () {
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () {
+                              // TODO: Navigate to Edit Page
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              _deleteProductDialog(
+                                context,
+                                ref,
+                                product.id.toString(),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.qr_code, color: Colors.blue),
+                            onPressed: () {
+                              // Step 1: Your JSON data
+                              final Map<String, dynamic> jsonData = {
+                                'productId': product.id,
+                                'productCategory': product.category,
+                                'productName': product.productName,
+                                'price': product.sellingPrice,
+                                'qty': product.quantity,
+                              };
 
-                          // Step 1: Your JSON data
-                          final Map<String, dynamic> jsonData = {
-                            'productId': product.id,
-                            'productCategory': product.category,
-                            'productName': product.productName,
-                            'price': product.sellingPrice,
-                            'qty': product.quantity,
-                          };
+                              // Step 2: Convert to string
+                              final String jsonString = jsonEncode(jsonData);
 
-                          // Step 2: Convert to string
-                          final String jsonString = jsonEncode(jsonData);
-
-                          showQrCodeDialog(context, jsonString,product.productName);
-                        },
+                              showQrCodeDialog(
+                                context,
+                                jsonString,
+                                product.productName,
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ]
+                    );
+                  },
+                ),
+              ),
+      ),
+    ],
   );
 }
+
 Widget _buildSearchBar(WidgetRef ref) {
   return TextField(
     decoration: InputDecoration(
@@ -209,7 +226,10 @@ void _showAddCategoryDialog(BuildContext context, WidgetRef ref) {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -225,7 +245,6 @@ void _showAddCategoryDialog(BuildContext context, WidgetRef ref) {
   );
 }
 
-
 void _deleteProductDialog(BuildContext context, WidgetRef ref, String id) {
   showDialog(
     context: context,
@@ -239,7 +258,10 @@ void _deleteProductDialog(BuildContext context, WidgetRef ref, String id) {
           const SizedBox(width: 8),
           Text(
             'Delete Product',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
           ),
         ],
       ),
@@ -251,13 +273,8 @@ void _deleteProductDialog(BuildContext context, WidgetRef ref, String id) {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey[700],
-          ),
-          child: Text(
-            'Cancel',
-            style: GoogleFonts.poppins(fontSize: 14),
-          ),
+          style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+          child: Text('Cancel', style: GoogleFonts.poppins(fontSize: 14)),
         ),
         ElevatedButton.icon(
           onPressed: () {
@@ -266,7 +283,9 @@ void _deleteProductDialog(BuildContext context, WidgetRef ref, String id) {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           icon: const Icon(Icons.delete_forever),
           label: Text(
@@ -299,6 +318,7 @@ void showQrCodeDialog(BuildContext context, String data, String productId) {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16),
+
                 /// QR Code inside Screenshot
                 Screenshot(
                   controller: screenshotController,
@@ -310,6 +330,7 @@ void showQrCodeDialog(BuildContext context, String data, String productId) {
                 ),
 
                 SizedBox(height: 16),
+
                 /// Row of Action Buttons: Share - Download - Print
                 Wrap(
                   spacing: 10,
@@ -329,7 +350,9 @@ void showQrCodeDialog(BuildContext context, String data, String productId) {
                       icon: const Icon(Icons.download),
                       label: const Text("Download QR"),
                       style: _buttonStyle(Colors.blue),
-                      onPressed: () { _downloadQRWeb(screenshotController,productId); },
+                      onPressed: () {
+                        _downloadQRWeb(screenshotController, productId);
+                      },
                     ),
 
                     /// Print Button
@@ -374,7 +397,10 @@ void showQrCodeDialog(BuildContext context, String data, String productId) {
   );
 }
 
-Future<void> _downloadQRWeb(ScreenshotController screenshotController, String productId) async {
+Future<void> _downloadQRWeb(
+  ScreenshotController screenshotController,
+  String productId,
+) async {
   Uint8List? image = await screenshotController.capture();
   if (image != null) {
     final blob = html.Blob([image]);
@@ -392,8 +418,6 @@ ButtonStyle _buttonStyle(Color color) {
     backgroundColor: color,
     foregroundColor: Colors.white,
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 }

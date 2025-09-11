@@ -5,6 +5,7 @@ import 'package:shopkeeper_admin/router/app_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'appConfig.dart';
+import 'core/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'DevAdmin',
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
       locale: context.locale,
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,

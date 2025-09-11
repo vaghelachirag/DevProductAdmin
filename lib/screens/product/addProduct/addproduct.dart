@@ -14,8 +14,6 @@ class AddProductPage extends ConsumerWidget {
 
   const AddProductPage({super.key});
 
-
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productId = ref.watch(productIdProvider);
@@ -37,7 +35,7 @@ class AddProductPage extends ConsumerWidget {
         final product = AddProductModel(
           id: productId,
           category: selectedCategory.toString(),
-          productName:  productNameController.text.trim(),
+          productName: productNameController.text.trim(),
           purchasePrice: priceController.text.trim(),
           sellingPrice: sellingPriceController.text.trim(),
           quantity: qtyController.text.trim(),
@@ -45,14 +43,13 @@ class AddProductPage extends ConsumerWidget {
         );
 
         ref.read(addProductProvider(product).future).then((result) {
-          if(result == true){
-
+          if (result == true) {
             productNameController.clear();
             priceController.clear();
             qtyController.clear();
 
             ref.read(productIdProvider.notifier).state =
-            'P${100000 + Random().nextInt(899999)}';
+                'P${100000 + Random().nextInt(899999)}';
             ref.read(productNameProvider.notifier).state = '';
             ref.read(productCategoryProvider.notifier).state = null;
             ref.read(purchasePriceProvider.notifier).state = '';
@@ -60,12 +57,10 @@ class AddProductPage extends ConsumerWidget {
             ref.read(quantityProvider.notifier).state = '';
 
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Product Added Successfully!"))
-            );
-          }else{
+                SnackBar(content: Text("Product Added Successfully!")));
+          } else {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Product Not Added Successfully!"))
-            );
+                SnackBar(content: Text("Product Not Added Successfully!")));
           }
         }).catchError((error) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -78,17 +73,13 @@ class AddProductPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.pink[50],
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: Text('addProduct'.tr(),
             style: GoogleFonts.poppins(
-              color: Colors.black87,
               fontWeight: FontWeight.w600,
               fontSize: 20,
             )),
-        iconTheme: const IconThemeData(color: Colors.black87),
+        centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -96,8 +87,8 @@ class AddProductPage extends ConsumerWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 6,
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -115,9 +106,8 @@ class AddProductPage extends ConsumerWidget {
                         icon: Icons.text_fields,
                         label: 'productName'.tr(),
                         controller: productNameController,
-                        onChanged: (val) => ref
-                            .read(productNameProvider.notifier)
-                            .state = val,
+                        onChanged: (val) =>
+                            ref.read(productNameProvider.notifier).state = val,
                       ),
                       const SizedBox(height: 16),
                       _textField(
@@ -145,40 +135,40 @@ class AddProductPage extends ConsumerWidget {
                       _textField(
                         context: context,
                         icon: Icons.confirmation_number,
-                        label:  'quantity'.tr(),
+                        label: 'quantity'.tr(),
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         onChanged: (val) =>
-                        ref.read(quantityProvider.notifier).state = val,
+                            ref.read(quantityProvider.notifier).state = val,
                       ),
                       const SizedBox(height: 24),
-                      if (isAdding) const Center(
-                        child: CircularProgressIndicator(),
-                      ) else ElevatedButton.icon(
-                        onPressed: submit,
-                        icon: const Icon(Icons.add, color: Color(0xFF7B4B3A)),
-                        label: Text(
-                          'addProduct'.tr(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF7B4B3A),
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFDEECF),
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            side: const BorderSide(
-                              color: Color(0xFF7B4B3A),
-                              width: 1.5,
+                      if (isAdding)
+                        const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      else
+                        ElevatedButton.icon(
+                          onPressed: submit,
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          label: Text(
+                            'addProduct'.tr(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
                             ),
                           ),
-                          elevation: 3,
-                          shadowColor: const Color(0xFF7B4B3A).withOpacity(0.3),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -199,7 +189,7 @@ class AddProductPage extends ConsumerWidget {
         prefixIcon: const Icon(Icons.code),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Colors.white,
       ),
       style: GoogleFonts.poppins(),
     );
@@ -223,7 +213,7 @@ class AddProductPage extends ConsumerWidget {
         prefixIcon: Icon(icon),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Colors.grey[50],
+        fillColor: Colors.white,
       ),
       style: GoogleFonts.poppins(),
     );

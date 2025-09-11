@@ -64,19 +64,12 @@ class AddCategoryPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.blue[50],
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: Text(
           'Add Category',
-          style: GoogleFonts.poppins(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-          ),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 20),
         ),
-        iconTheme: const IconThemeData(color: Colors.black87),
+        centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -105,32 +98,27 @@ class AddCategoryPage extends ConsumerWidget {
                       isAdding
                           ? const Center(child: CircularProgressIndicator())
                           : ElevatedButton.icon(
-                        onPressed: submit,
-                        icon: const Icon(Icons.add, color: Color(0xFF1E3A8A)),
-                        label: Text(
-                          'Add Category',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF1E3A8A),
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFDCEAFE),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14, horizontal: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            side: const BorderSide(
-                              color: Color(0xFF1E3A8A),
-                              width: 1.5,
+                              onPressed: submit,
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              label: Text(
+                                'Add Category',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 14, horizontal: 20),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
                             ),
-                          ),
-                          elevation: 3,
-                          shadowColor:
-                          const Color(0xFF1E3A8A).withOpacity(0.3),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -159,7 +147,7 @@ class AddCategoryPage extends ConsumerWidget {
         prefixIcon: Icon(icon),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Colors.grey[50],
+        fillColor: Colors.white,
       ),
       style: GoogleFonts.poppins(),
     );
