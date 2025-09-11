@@ -115,6 +115,7 @@ class ApiService {
       throw Exception("Failed to fetch bills");
     }
   }
+
   // For Add Product
   Future<bool> addProduct(AddProductModel product) async {
     final uri = Uri.parse(_baseUrl).replace(queryParameters: product.toJson());
