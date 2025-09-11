@@ -51,10 +51,7 @@ Widget loadData(WidgetRef ref, List<ProductModel> products) {
   return Column(
     children: [
       const SizedBox(height: 10),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: _buildSearchBar(ref),
-      ),
+      _buildSearchBar(ref),
       const SizedBox(height: 12),
       Expanded(
         child: products.isEmpty
@@ -67,7 +64,6 @@ Widget loadData(WidgetRef ref, List<ProductModel> products) {
                 elevation: 6,
                 color: Colors.white,
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(12),
                   itemCount: filteredProducts.length,
                   separatorBuilder: (_, __) => const Divider(height: 1),
                   itemBuilder: (context, index) {

@@ -1,5 +1,6 @@
-
 import 'dart:math';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,7 +8,6 @@ import 'package:shopkeeper_admin/model/add_product_model.dart';
 
 import '../../../widgets/product_master_dropdown.dart';
 import 'add_product_provider.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class AddProductPage extends ConsumerWidget {
   static const route = "/AddProductPage";
@@ -42,43 +42,49 @@ class AddProductPage extends ConsumerWidget {
           action: 'addProduct',
         );
 
-        ref.read(addProductProvider(product).future).then((result) {
-          if (result == true) {
-            productNameController.clear();
-            priceController.clear();
-            qtyController.clear();
+        ref
+            .read(addProductProvider(product).future)
+            .then((result) {
+              if (result == true) {
+                productNameController.clear();
+                priceController.clear();
+                qtyController.clear();
 
-            ref.read(productIdProvider.notifier).state =
-                'P${100000 + Random().nextInt(899999)}';
-            ref.read(productNameProvider.notifier).state = '';
-            ref.read(productCategoryProvider.notifier).state = null;
-            ref.read(purchasePriceProvider.notifier).state = '';
-            ref.read(sellingPriceProvider.notifier).state = '';
-            ref.read(quantityProvider.notifier).state = '';
+                ref.read(productIdProvider.notifier).state =
+                    'P${100000 + Random().nextInt(899999)}';
+                ref.read(productNameProvider.notifier).state = '';
+                ref.read(productCategoryProvider.notifier).state = null;
+                ref.read(purchasePriceProvider.notifier).state = '';
+                ref.read(sellingPriceProvider.notifier).state = '';
+                ref.read(quantityProvider.notifier).state = '';
 
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Product Added Successfully!")));
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Product Not Added Successfully!")));
-          }
-        }).catchError((error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.toString())),
-          );
-        }).whenComplete(() {
-          ref.read(isAddingProductProvider.notifier).state = false; // ✅ stop loading
-        });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Product Added Successfully!")),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Product Not Added Successfully!")),
+                );
+              }
+            })
+            .catchError((error) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(error.toString())));
+            })
+            .whenComplete(() {
+              ref.read(isAddingProductProvider.notifier).state =
+                  false; // ✅ stop loading
+            });
       }
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('addProduct'.tr(),
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-            )),
+        title: Text(
+          'addProduct'.tr(),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 20),
+        ),
         centerTitle: true,
       ),
       body: Center(
@@ -87,8 +93,9 @@ class AddProductPage extends ConsumerWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Card(
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 6,
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -97,8 +104,17 @@ class AddProductPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _readonlyField('productId'.tr(), productId),
+                      _readonlyField('productId'.tr(), productId, context),
                       const SizedBox(height: 16),
+                      Text(
+                        'category'
+                            .tr(), // 🔹 localization key (EasyLocalization)
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       ProductMasterDropdown(),
                       const SizedBox(height: 16),
                       _textField(
@@ -116,9 +132,9 @@ class AddProductPage extends ConsumerWidget {
                         label: 'purchasePrice'.tr(),
                         controller: priceController,
                         keyboardType: TextInputType.number,
-                        onChanged: (val) => ref
-                            .read(purchasePriceProvider.notifier)
-                            .state = val,
+                        onChanged: (val) =>
+                            ref.read(purchasePriceProvider.notifier).state =
+                                val,
                       ),
                       const SizedBox(height: 16),
                       _textField(
@@ -127,9 +143,8 @@ class AddProductPage extends ConsumerWidget {
                         label: 'sellingPrice'.tr(),
                         controller: sellingPriceController,
                         keyboardType: TextInputType.number,
-                        onChanged: (val) => ref
-                            .read(sellingPriceProvider.notifier)
-                            .state = val,
+                        onChanged: (val) =>
+                            ref.read(sellingPriceProvider.notifier).state = val,
                       ),
                       const SizedBox(height: 16),
                       _textField(
@@ -143,9 +158,7 @@ class AddProductPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 24),
                       if (isAdding)
-                        const Center(
-                          child: CircularProgressIndicator(),
-                        )
+                        const Center(child: CircularProgressIndicator())
                       else
                         ElevatedButton.icon(
                           onPressed: submit,
@@ -159,10 +172,13 @@ class AddProductPage extends ConsumerWidget {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
                             padding: const EdgeInsets.symmetric(
-                                vertical: 14, horizontal: 20),
+                              vertical: 14,
+                              horizontal: 20,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -180,18 +196,51 @@ class AddProductPage extends ConsumerWidget {
     );
   }
 
-  Widget _readonlyField(String label, String value) {
-    return TextFormField(
-      initialValue: value,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: const Icon(Icons.code),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      style: GoogleFonts.poppins(),
+  Widget _readonlyField(String label, String value, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          initialValue: value,
+          readOnly: true,
+          decoration: InputDecoration(
+            hintText: label,
+            prefixIcon: _buildPrefixIcon(icon: Icons.code, context: context),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 16,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.red.shade400, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.red.shade400, width: 1.5),
+            ),
+          ),
+          style: GoogleFonts.poppins(),
+        ),
+      ],
     );
   }
 
@@ -203,19 +252,72 @@ class AddProductPage extends ConsumerWidget {
     TextInputType keyboardType = TextInputType.text,
     required void Function(String) onChanged,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      onChanged: onChanged,
-      validator: (val) => val == null || val.isEmpty ? 'Enter $label' : null,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Colors.white,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          onChanged: onChanged,
+          validator: (val) =>
+              val == null || val.isEmpty ? 'Enter $label' : null,
+          decoration: InputDecoration(
+            hintText: label,
+            prefixIcon: _buildPrefixIcon(icon: icon, context: context),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 16,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.red.shade400, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.red.shade400, width: 1.5),
+            ),
+          ),
+          style: GoogleFonts.poppins(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrefixIcon({
+    required BuildContext context,
+    required IconData icon,
+  }) {
+    final Color primary = Theme.of(context).colorScheme.primary;
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 8),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: primary.withOpacity(0.08),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: primary, size: 20),
       ),
-      style: GoogleFonts.poppins(),
     );
   }
 }
